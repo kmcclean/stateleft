@@ -2,7 +2,6 @@ package com.dataparser;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,26 +13,31 @@ public class dataparser {
         dataParserModeler dataModel = startupDatabase();
         HashMap electionDataHashMap = getDataFromFile();
 
-        if (dataModel.addDataToPartyTable((List) electionDataHashMap.get("politicalPartyList"))) {
-            System.out.println("political_party_table update successful.");
-        } else {
-            System.out.println("political_party_table update failed.");
-            System.exit(1);
+//        if (dataModel.addDataToPartyTable((List) electionDataHashMap.get("politicalPartyList"))) {
+//            System.out.println("political_party_table update successful.");
+//        } else {
+//            System.out.println("political_party_table update failed.");
+//            System.exit(1);
+//        }
+//        if (dataModel.addDataToPersonTable((List) electionDataHashMap.get("personNamesList"))) {
+//            System.out.println("person_table update successful.");
+//        } else {
+//            System.out.println("person_table update failed.");
+//            System.exit(1);
+//        }
+//        if (dataModel.addDataToRaceTable()) {
+//            System.out.println("race_table update successful.");
+//        } else {
+//            System.out.println("race_table update failed.");
+//            System.exit(1);
+//        }
+        if(dataModel.closeConnection()){
+            System.out.println("Connction successfully closed.");
         }
-        if (dataModel.addDataToPersonTable((List) electionDataHashMap.get("personNamesList"))) {
-            System.out.println("person_table update successful.");
-        } else {
-            System.out.println("person_table update failed.");
-            System.exit(1);
+        else{
+            System.out.println("Connection closure failed.");
+            System.out.println(1);
         }
-        if (dataModel.addDataToRaceTable()) {
-            System.out.println("race_table update successful.");
-        } else {
-            System.out.println("person_table update failed.");
-            System.exit(1);
-        }
-
-
     }
 
     public static dataParserModeler startupDatabase() {
@@ -65,7 +69,7 @@ public class dataparser {
                     candidateHashMap.put("name", resultsLine[1]);
                     candidateHashMap.put("votes", resultsLine[2]);
                     candidateHashMap.put("percentage", resultsLine[3]);
-                    if (Double.parseDouble(resultsLine[3]) >= 50) {
+                    if (Double.parseDouble(resultsLine[3].substring(0, 4)) >= 50) {
                         candidateHashMap.put("result", "Won");
                     } else {
                         candidateHashMap.put("result", "Lost");
