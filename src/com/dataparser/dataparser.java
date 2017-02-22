@@ -31,12 +31,27 @@ public class dataparser {
 //            System.out.println("race_table update failed.");
 //            System.exit(1);
 //        }
+//        if(dataModel.addDataToCandidateTable((List) electionDataHashMap.get("candidateList"))){
+//            System.out.println("candidates successfully added.");
+//        }
+//        else{
+//            System.out.println("candidates not added.");
+//            System.exit(0);
+//        }
+        if(dataModel.outputTest()){
+            System.out.println("Test successsfully ran.");
+        }
+        else{
+            dataModel.closeConnection();
+            System.exit(1);
+        }
         if(dataModel.closeConnection()){
             System.out.println("Connction successfully closed.");
         }
         else{
+            dataModel.closeConnection();
             System.out.println("Connection closure failed.");
-            System.out.println(1);
+            System.exit(0);
         }
     }
 
@@ -54,33 +69,28 @@ public class dataparser {
             Object[] stringArray = stream.toArray();
             List<String> personNamesList = new ArrayList<>();
             List<String> politicalParyList = new ArrayList<>();
-            List<HashMap> candidateHMList = new ArrayList<>();
+            List<Candidate> candidateList = new ArrayList<>();
 
-
+            String houseDistrict = null;
             for (Object houseResultLine : stringArray) {
-                HashMap candidateHashMap = new HashMap();
-                if (houseResultLine.toString().substring(houseResultLine.toString().length() - 1).equals("%") && !houseResultLine.toString().contains("WRITE-IN")) {
+
+                if(houseResultLine.toString().contains("State Representative District")){
+                    houseDistrict = houseResultLine.toString();
+                }
+                else if (houseResultLine.toString().substring(houseResultLine.toString().length() - 1).equals("%") && !houseResultLine.toString().contains("WRITE-IN")) {
                     String[] resultsLine = houseResultLine.toString().split("\t");
                     if (!politicalParyList.contains(resultsLine[0])) {
                         politicalParyList.add(resultsLine[0]);
                     }
                     personNamesList.add(resultsLine[1]);
-                    candidateHashMap.put("party", resultsLine[0]);
-                    candidateHashMap.put("name", resultsLine[1]);
-                    candidateHashMap.put("votes", resultsLine[2]);
-                    candidateHashMap.put("percentage", resultsLine[3]);
-                    if (Double.parseDouble(resultsLine[3].substring(0, 4)) >= 50) {
-                        candidateHashMap.put("result", "Won");
-                    } else {
-                        candidateHashMap.put("result", "Lost");
-                    }
-                    candidateHMList.add(candidateHashMap);
+                    Candidate candidate = new Candidate(resultsLine[0], resultsLine[1], resultsLine[2], resultsLine[3], houseDistrict);
+                    candidateList.add(candidate);
                 }
             }
 
             electionDataHashMap.put("personNamesList", personNamesList);
             electionDataHashMap.put("politicalPartyList", politicalParyList);
-            electionDataHashMap.put("candidateHMList", candidateHMList);
+            electionDataHashMap.put("candidateList", candidateList);
 
         } catch (IOException e) {
             System.out.println(e);

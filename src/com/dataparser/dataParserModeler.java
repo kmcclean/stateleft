@@ -1,12 +1,11 @@
 package com.dataparser;
 import com.sun.rowset.internal.Row;
 
+import javax.xml.transform.Result;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class dataParserModeler {
@@ -36,36 +35,6 @@ public class dataParserModeler {
         return true;
     }
 
-    //TODO Work on this next.
-//    public boolean addDataToCandidateTable(List<String> candidateInformationList){
-//        try {
-//            //http://stackoverflow.com/questions/16882971/retrieve-entire-row-with-resultset
-//            ResultSet raceTableResultsSet = getTableData("race_table", "election_cycle_id", "1");
-//            HashMap raceTableHashMap = new HashMap();
-//            Row row = null;
-//            List<Row> raceTableTable = new ArrayList<Row>();
-//            for (raceTableResultsSet.next()){
-//                raceTableHashMap.put(raceTableResultsSet.getString("district_id"), raceTableResultsSet.);
-//            }
-//
-//            PreparedStatement politicalPartiesPreparedStatement = null;
-//            for (String party : politicalPartyList) {
-//                politicalPartiesPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("insert into political_party_table (party_name) values (?)");
-//                politicalPartiesPreparedStatement.setString(1, party);
-//                politicalPartiesPreparedStatement.addBatch();
-//            }
-//            politicalPartiesPreparedStatement.executeBatch();
-//            this.swingLeftDatabaseConnection.commit();
-//            politicalPartiesPreparedStatement.close();
-//        }
-//        catch (SQLException sqle){
-//            System.out.println(sqle);
-//            return false;
-//        }
-//        return true;
-//    }
-
-
     //Takes the data about people and creates entries into the political_party table.
     public boolean addDataToPartyTable(List<String> politicalPartyList){
         try {
@@ -91,7 +60,6 @@ public class dataParserModeler {
             PreparedStatement personNamesListPreparedStatement = null;
             for (String person : personNamesList) {
                 String[] personNameStringSplit = person.split(" ");
-                //System.out.println(personNameStringSplit.length);
                 if (personNameStringSplit.length <= 3) {
                     personNamesListPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("insert into person_table (first_name, last_name) values (?, ?)");
                     personNamesListPreparedStatement.setString(1, personNameStringSplit[1]);
@@ -125,29 +93,80 @@ public class dataParserModeler {
         return true;
     }
 
-    //add data to the races table.
-    public boolean addDataToRaceTable (){
-        try {
-            PreparedStatement raceTablePreparedStatement;
 
-            raceTablePreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("SELECT * FROM district_table WHERE seat_type LIKE 'house'");
-            ResultSet districtResultSet = raceTablePreparedStatement.executeQuery();
+    public boolean addDataToCandidateTable(List<Candidate> candidateList){
+            try {
+                PreparedStatement candidateTablePreparedStatment = null;
 
-            raceTablePreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("SELECT * FROM election_cycle_table WHERE cycle_year LIKE '2016'");
-            ResultSet electionCycleResultSet = raceTablePreparedStatement.executeQuery();
+                ResultSet districtTableResultSet = getTableData("district_table");
+                ResultSet partyTableResultSet = getTableData("political_party_table");
+                ResultSet personTableResultSet = getTableData("person_table");
+                //ResultSet electionCycleTableResultsSet = getTableData("election_cycle_table", "cycle_year", 2016);
 
-            while(electionCycleResultSet.next()) {
-                int election_id = electionCycleResultSet.getInt("election_cycle_id");
-                while (districtResultSet.next()) {
-                    int district_id = districtResultSet.getInt("district_id");
-                    raceTablePreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("INSERT INTO race_table (district_id, election_cycle_id) VALUES (?, ?)");
-                    raceTablePreparedStatement.setInt(1, district_id);
-                    raceTablePreparedStatement.setInt(2, election_id);
-                    raceTablePreparedStatement.executeUpdate();
+                HashMap districtTableHashMap = new HashMap();
+                HashMap partyTableHashMap = new HashMap();
+                HashMap personTableHashMap = new HashMap();
+                //HashMap electionCycleTableHashMap = new HashMap();
+
+                while(districtTableResultSet.next()){
+                    districtTableHashMap.put(districtTableResultSet.getString("district_name").trim(), districtTableResultSet.getInt("district_id"));
                 }
+                while(partyTableResultSet.next()){
+                    partyTableHashMap.put(partyTableResultSet.getString("party_name").trim(), partyTableResultSet.getInt("party_id"));
+                }
+                while(personTableResultSet.next()){
+                    String[] nameArray =  {personTableResultSet.getString("first_name"), personTableResultSet.getString("middle_name"), personTableResultSet.getString("last_name"), personTableResultSet.getString("post_nominal")};
+                    String nameString = "";
+                    for (String namePiece: nameArray){
+                        if(namePiece !=null){
+                            nameString += namePiece + " ";
+                        }
+                    }
+                    nameString.trim();
+                    personTableHashMap.put(nameString.trim(), personTableResultSet.getInt("person_id"));
+                }
+//                while(electionCycleTableResultsSet.next()){
+//                    electionCycleTableHashMap.put(electionCycleTableResultsSet.getInt("cycle_year"), electionCycleTableResultsSet.getInt("election_cycle_year"));
+//                }
+                for(Candidate candidate: candidateList){
+                    //System.out.println(personTableHashMap.get("Cal (Calvin) K. Bahr"));
+                    System.out.println(candidate.getCandidateNameString());
+                    candidateTablePreparedStatment = this.swingLeftDatabaseConnection.prepareStatement("INSERT INTO candidate_table (party_id, result_percentage, result_votes, result, person_id, election_cycle_id, district_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                    candidateTablePreparedStatment.setInt(1, (Integer) partyTableHashMap.get(candidate.getCandidatePartyString()));
+                    candidateTablePreparedStatment.setDouble(2, candidate.getCandidatePercentageDouble());
+                    candidateTablePreparedStatment.setInt(3, candidate.getCandidateVotesString());
+                    candidateTablePreparedStatment.setString(4, candidate.getCandidateResultString());
+                    candidateTablePreparedStatment.setInt(5, (Integer) personTableHashMap.get(candidate.getCandidateNameString()));
+                    candidateTablePreparedStatment.setInt(6, 1);
+                    candidateTablePreparedStatment.setInt(7, (Integer) districtTableHashMap.get(candidate.getCandidateDistrictString()));
+                    candidateTablePreparedStatment.executeUpdate();
+                }
+                this.swingLeftDatabaseConnection.commit();
+                candidateTablePreparedStatment.close();
+
             }
-            this.swingLeftDatabaseConnection.commit();
-            raceTablePreparedStatement.close();
+            catch (SQLException sqle){
+                System.out.println(sqle);
+                return false;
+            }
+            return true;
+    }
+
+    public boolean outputTest(){
+        ResultSet tableDataResultSet = null;
+        String tableName = "candidate_table";
+        String column = "result";
+        String condition = "Won";
+        try{
+            PreparedStatement tableDataPreparedStatement;
+            String preStatement = "SELECT * FROM " + tableName +" WHERE " + column + " LIKE ?";
+            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement(preStatement);
+            tableDataPreparedStatement.setString(1, "Won");
+            tableDataResultSet = tableDataPreparedStatement.executeQuery();
+            while(tableDataResultSet.next()){
+                System.out.println("Id: " + tableDataResultSet.getInt("candidate_id"));
+                System.out.println("Result: " + tableDataResultSet.getString("result"));
+            }
         }
         catch (SQLException sqle){
             System.out.println(sqle);
@@ -157,12 +176,10 @@ public class dataParserModeler {
     }
 
     public ResultSet getTableData(String tableName){
-
         ResultSet tableDataResultSet = null;
         try{
             PreparedStatement tableDataPreparedStatement;
-            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("SELECT * FROM ?");
-            tableDataPreparedStatement.setString(1, tableName);
+            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("SELECT * FROM " + tableName);
             tableDataResultSet = tableDataPreparedStatement.executeQuery();
         }
         catch (SQLException sqle){
@@ -175,11 +192,29 @@ public class dataParserModeler {
         ResultSet tableDataResultSet = null;
         try{
             PreparedStatement tableDataPreparedStatement;
-            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("SELECT * FROM ? WHERE ? LIKE ?");
-            tableDataPreparedStatement.setString(1, tableName);
-            tableDataPreparedStatement.setString(2, whereColumn);
-            tableDataPreparedStatement.setString(3, whereValue);
+            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("SELECT * FROM " + tableName + " WHERE ? LIKE ?");
+            tableDataPreparedStatement.setString(1, whereColumn);
+            tableDataPreparedStatement.setString(2, whereValue);
             tableDataResultSet = tableDataPreparedStatement.executeQuery();
+            while(tableDataResultSet.next()){
+                System.out.println(tableDataResultSet.getString("district_name"));
+            }
+        }
+        catch (SQLException sqle){
+            System.out.println(sqle);
+        }
+        return tableDataResultSet;
+    }
+
+    public ResultSet getTableData(String tableName, String whereColumn, int whereValue){
+        ResultSet tableDataResultSet = null;
+        try{
+            PreparedStatement tableDataPreparedStatement;
+            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("SELECT * FROM " + tableName + " WHERE ? = ?");
+            tableDataPreparedStatement.setString(1, whereColumn);
+            tableDataPreparedStatement.setInt(2, whereValue);
+            tableDataResultSet = tableDataPreparedStatement.executeQuery();
+
         }
         catch (SQLException sqle){
             System.out.println(sqle);
