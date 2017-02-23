@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.util.stream.Stream;
 
 public class dataParserModeler {
@@ -35,9 +36,16 @@ public class dataParserModeler {
         return true;
     }
 
-    //Takes the data about people and creates entries into the political_party table.
+    //Takes the data about people and creates entries into the political_party table. If the party already exists, then it doesn't add it.
     public boolean addDataToPartyTable(List<String> politicalPartyList){
+
+        ResultSet existingPoliticalPartiesResultsSet = getTableData("political_party_table");
         try {
+            while(existingPoliticalPartiesResultsSet.next()){
+                if(politicalPartyList.contains(existingPoliticalPartiesResultsSet.getString("party_name"))){
+                    politicalPartyList.remove(existingPoliticalPartiesResultsSet.getString("party_name"));
+                }
+            }
             PreparedStatement politicalPartiesPreparedStatement = null;
             for (String party : politicalPartyList) {
                 politicalPartiesPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("insert into political_party_table (party_name) values (?)");
@@ -125,11 +133,7 @@ public class dataParserModeler {
                     nameString.trim();
                     personTableHashMap.put(nameString.trim(), personTableResultSet.getInt("person_id"));
                 }
-//                while(electionCycleTableResultsSet.next()){
-//                    electionCycleTableHashMap.put(electionCycleTableResultsSet.getInt("cycle_year"), electionCycleTableResultsSet.getInt("election_cycle_year"));
-//                }
                 for(Candidate candidate: candidateList){
-                    //System.out.println(personTableHashMap.get("Cal (Calvin) K. Bahr"));
                     System.out.println(candidate.getCandidateNameString());
                     candidateTablePreparedStatment = this.swingLeftDatabaseConnection.prepareStatement("INSERT INTO candidate_table (party_id, result_percentage, result_votes, result, person_id, election_cycle_id, district_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
                     candidateTablePreparedStatment.setInt(1, (Integer) partyTableHashMap.get(candidate.getCandidatePartyString()));
@@ -152,16 +156,42 @@ public class dataParserModeler {
             return true;
     }
 
+    public boolean addDataToLegislatureSeatsTable(){
+        List<String> selectList = new ArrayList<String>(Arrays.asList("person_id", "district_id", "party_id"));
+        ResultSet electionResultsResultSet = getTableData(selectList,"candidate_table", "result", "won");
+        try{
+            PreparedStatement addDataToLegislatureSeatsTablePreparedStatement = null;
+            String preStatementString = "INSERT INTO legislature_seats_table (person_id, district_id, elected_date, in_office, party_id) VALUES (?, ?, '2016-11-08', 'Yes', ?)";
+            java.sql.Date electionDate = new java.sql.Date(2016);
+            //System.out.println(electionDate.toString());
+            while(electionResultsResultSet.next()){
+                addDataToLegislatureSeatsTablePreparedStatement = this.swingLeftDatabaseConnection.prepareStatement(preStatementString);
+                addDataToLegislatureSeatsTablePreparedStatement.setInt(1, electionResultsResultSet.getInt("person_id"));
+                addDataToLegislatureSeatsTablePreparedStatement.setInt(2, electionResultsResultSet.getInt("district_id"));
+                addDataToLegislatureSeatsTablePreparedStatement.setInt(3, electionResultsResultSet.getInt("party_id"));
+                addDataToLegislatureSeatsTablePreparedStatement.executeUpdate();
+            }
+            this.swingLeftDatabaseConnection.commit();
+            addDataToLegislatureSeatsTablePreparedStatement.close();
+        }
+        catch (SQLException sqle){
+            System.out.println(sqle);
+            return false;
+        }
+        return true;
+    }
+
     public boolean outputTest(){
         ResultSet tableDataResultSet = null;
         String tableName = "candidate_table";
         String column = "result";
         String condition = "Won";
+        String selection = "*";
         try{
             PreparedStatement tableDataPreparedStatement;
-            String preStatement = "SELECT * FROM " + tableName +" WHERE " + column + " LIKE ?";
+            String preStatement = "SELECT " + selection + " FROM " + tableName +" WHERE " + column + " LIKE ?";
             tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement(preStatement);
-            tableDataPreparedStatement.setString(1, "Won");
+            tableDataPreparedStatement.setString(1, condition);
             tableDataResultSet = tableDataPreparedStatement.executeQuery();
             while(tableDataResultSet.next()){
                 System.out.println("Id: " + tableDataResultSet.getInt("candidate_id"));
@@ -178,8 +208,9 @@ public class dataParserModeler {
     public ResultSet getTableData(String tableName){
         ResultSet tableDataResultSet = null;
         try{
+            String sqlStatementString = "SELECT * FROM " + tableName;
             PreparedStatement tableDataPreparedStatement;
-            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("SELECT * FROM " + tableName);
+            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementString);
             tableDataResultSet = tableDataPreparedStatement.executeQuery();
         }
         catch (SQLException sqle){
@@ -191,10 +222,10 @@ public class dataParserModeler {
     public ResultSet getTableData(String tableName, String whereColumn, String whereValue){
         ResultSet tableDataResultSet = null;
         try{
+            String sqlStatementString = "SELECT * FROM " + tableName + " WHERE " + whereColumn +" LIKE ?";
             PreparedStatement tableDataPreparedStatement;
-            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("SELECT * FROM " + tableName + " WHERE ? LIKE ?");
-            tableDataPreparedStatement.setString(1, whereColumn);
-            tableDataPreparedStatement.setString(2, whereValue);
+            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementString);
+            tableDataPreparedStatement.setString(1, whereValue);
             tableDataResultSet = tableDataPreparedStatement.executeQuery();
             while(tableDataResultSet.next()){
                 System.out.println(tableDataResultSet.getString("district_name"));
@@ -209,10 +240,37 @@ public class dataParserModeler {
     public ResultSet getTableData(String tableName, String whereColumn, int whereValue){
         ResultSet tableDataResultSet = null;
         try{
+            String sqlStatementString = "SELECT * FROM " + tableName + " WHERE " + whereColumn +" LIKE ?";
             PreparedStatement tableDataPreparedStatement;
-            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement("SELECT * FROM " + tableName + " WHERE ? = ?");
-            tableDataPreparedStatement.setString(1, whereColumn);
-            tableDataPreparedStatement.setInt(2, whereValue);
+            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementString);
+            tableDataPreparedStatement.setInt(1, whereValue);
+            tableDataResultSet = tableDataPreparedStatement.executeQuery();
+
+        }
+        catch (SQLException sqle){
+            System.out.println(sqle);
+        }
+        return tableDataResultSet;
+    }
+
+    public ResultSet getTableData(List<String> selectList,String tableName, String whereColumn, String whereValue){
+        ResultSet tableDataResultSet = null;
+        StringJoiner selectionStringJoiner = new StringJoiner(", ");
+        String selectionString;
+        if(selectList.size() < 1){
+            selectionString = "*";
+        }
+        else {
+            for (String selection : selectList) {
+                selectionStringJoiner.add(selection);
+            }
+            selectionString = selectionStringJoiner.toString();
+        }
+        try{
+            PreparedStatement tableDataPreparedStatement;
+            String preStatement = "SELECT " + selectionString + " FROM " + tableName +" WHERE " + whereColumn + " LIKE ?";
+            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement(preStatement);
+            tableDataPreparedStatement.setString(1, whereValue);
             tableDataResultSet = tableDataPreparedStatement.executeQuery();
 
         }
