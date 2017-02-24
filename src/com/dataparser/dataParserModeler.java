@@ -62,6 +62,150 @@ public class dataParserModeler {
         return true;
     }
 
+    public boolean addLowerHouseDistricts() {
+        PreparedStatement lowerHousePreparedStatment = null;
+        int counter = 0;
+        try (Stream<String> stream = Files.lines(Paths.get("data/district_info/lower_house_info.txt"))) {
+            Object[] stringArray = stream.toArray();
+            lowerHousePreparedStatment = null;
+            for (Object lowerHouseObject : stringArray) {
+                String lowerHouseString = lowerHouseObject.toString();
+                String[] lowerHouseStringArray = lowerHouseString.split(",");
+                if(!lowerHouseStringArray[0].equals("MN")) {
+                    String prePreparedStatementString = "insert into district_table(state, district_name, district_type, longitude, latitude) values (?, ?, ?, ?, ?)";
+                    lowerHousePreparedStatment = this.swingLeftDatabaseConnection.prepareStatement(prePreparedStatementString);
+                    lowerHousePreparedStatment.setString(1, lowerHouseStringArray[0]);
+                    lowerHousePreparedStatment.setString(2, lowerHouseStringArray[1]);
+                    lowerHousePreparedStatment.setString(3, lowerHouseStringArray[2]);
+                    lowerHousePreparedStatment.setDouble(4, Double.parseDouble(lowerHouseStringArray[3].trim()));
+                    lowerHousePreparedStatment.setDouble(5, Double.parseDouble(lowerHouseStringArray[4].trim()));
+                    lowerHousePreparedStatment.executeUpdate();
+                    counter++;
+                }
+                else{
+                    String prePreparedStatementString = "UPDATE district_table SET longitude = ?, latitude = ? WHERE district_name = ?";
+                    lowerHousePreparedStatment = this.swingLeftDatabaseConnection.prepareCall(prePreparedStatementString);
+                    lowerHousePreparedStatment.setDouble(1, Double.parseDouble(lowerHouseStringArray[3].trim()));
+                    lowerHousePreparedStatment.setDouble(2, Double.parseDouble(lowerHouseStringArray[4].trim()));
+                    lowerHousePreparedStatment.setString(3, lowerHouseStringArray[1]);
+                    lowerHousePreparedStatment.executeUpdate();
+                    counter++;
+                }
+            }
+            this.swingLeftDatabaseConnection.commit();
+            lowerHousePreparedStatment.close();
+        } catch (Exception e) {
+            System.out.println("Around line: " + counter);
+            System.out.println(e);
+            return false;
+        }
+        return true;
+    }
+
+    public boolean updateMinnesotaLocations() {
+        PreparedStatement upperHousePreparedStatment = null;
+        int counter = 0;
+        try (Stream<String> stream = Files.lines(Paths.get("data/district_info/upper_house_info.txt"))) {
+            Object[] stringArray = stream.toArray();
+            upperHousePreparedStatment = null;
+            for (Object upperHouseObject : stringArray) {
+                String upperHouseString = upperHouseObject.toString();
+                String[] upperHouseStringArray = upperHouseString.split(",");
+                if (!upperHouseStringArray[0].equals("MN")) {
+                    counter++;
+                    String prePreparedStatementString = "insert into district_table(state, district_name, district_type, longitude, latitude) values (?, ?, ?, ?, ?)";
+                    upperHousePreparedStatment = this.swingLeftDatabaseConnection.prepareStatement(prePreparedStatementString);
+                    upperHousePreparedStatment.setString(1, upperHouseStringArray[0]);
+                    upperHousePreparedStatment.setString(2, upperHouseStringArray[1]);
+                    upperHousePreparedStatment.setString(3, upperHouseStringArray[2]);
+                    upperHousePreparedStatment.setDouble(4, Double.parseDouble(upperHouseStringArray[3].trim()));
+                    upperHousePreparedStatment.setDouble(5, Double.parseDouble(upperHouseStringArray[4].trim()));
+                    upperHousePreparedStatment.executeUpdate();
+                } else {
+                    counter++;
+                    String prePreparedStatementString = "UPDATE district_table SET longitude = ?, latitude = ? WHERE district_name = ?";
+                    upperHousePreparedStatment = this.swingLeftDatabaseConnection.prepareCall(prePreparedStatementString);
+                    upperHousePreparedStatment.setDouble(1, Double.parseDouble(upperHouseStringArray[3].trim()));
+                    upperHousePreparedStatment.setDouble(2, Double.parseDouble(upperHouseStringArray[4].trim()));
+                    upperHousePreparedStatment.setString(3, upperHouseStringArray[1]);
+                    upperHousePreparedStatment.executeUpdate();
+                }
+            }
+            this.swingLeftDatabaseConnection.commit();
+            upperHousePreparedStatment.close();
+        } catch (Exception e) {
+            System.out.println("Fault on line " + counter + ".");
+            System.out.println(e);
+            return false;
+        }
+        return true;
+    }
+
+
+    public boolean addUpperHouseDistricts() {
+        PreparedStatement upperHousePreparedStatment = null;
+        int counter = 0;
+        try (Stream<String> stream = Files.lines(Paths.get("data/district_info/upper_house_info.txt"))) {
+            Object[] stringArray = stream.toArray();
+            upperHousePreparedStatment = null;
+            for (Object upperHouseObject : stringArray) {
+                String upperHouseString = upperHouseObject.toString();
+                String[] upperHouseStringArray = upperHouseString.split(",");
+                if (!upperHouseStringArray[0].equals("MN")) {
+                    counter++;
+                    String prePreparedStatementString = "insert into district_table(state, district_name, district_type, longitude, latitude) values (?, ?, ?, ?, ?)";
+                    upperHousePreparedStatment = this.swingLeftDatabaseConnection.prepareStatement(prePreparedStatementString);
+                    upperHousePreparedStatment.setString(1, upperHouseStringArray[0]);
+                    upperHousePreparedStatment.setString(2, upperHouseStringArray[1]);
+                    upperHousePreparedStatment.setString(3, upperHouseStringArray[2]);
+                    upperHousePreparedStatment.setDouble(4, Double.parseDouble(upperHouseStringArray[3].trim()));
+                    upperHousePreparedStatment.setDouble(5, Double.parseDouble(upperHouseStringArray[4].trim()));
+                    upperHousePreparedStatment.executeUpdate();
+                } else {
+                    counter++;
+                    String prePreparedStatementString = "UPDATE district_table SET longitude = ?, latitude = ? WHERE district_name = ?";
+                    upperHousePreparedStatment = this.swingLeftDatabaseConnection.prepareCall(prePreparedStatementString);
+                    upperHousePreparedStatment.setDouble(1, Double.parseDouble(upperHouseStringArray[3].trim()));
+                    upperHousePreparedStatment.setDouble(2, Double.parseDouble(upperHouseStringArray[4].trim()));
+                    upperHousePreparedStatment.setString(3, upperHouseStringArray[1]);
+                    upperHousePreparedStatment.executeUpdate();
+                }
+            }
+            this.swingLeftDatabaseConnection.commit();
+            upperHousePreparedStatment.close();
+        } catch (Exception e) {
+            System.out.println("Fault on line " + counter + ".");
+            System.out.println(e);
+            return false;
+        }
+        return true;
+    }
+
+    public boolean addZipCodeInfo() {
+        PreparedStatement zipCodePreparedStatment = null;
+        try (Stream<String> stream = Files.lines(Paths.get("data/zip_codes/zip_codes_long_lat.txt"))) {
+            Object[] stringArray = stream.toArray();
+            zipCodePreparedStatment = null;
+            for (Object zipCodeObject : stringArray) {
+                String zipCodeString = zipCodeObject.toString();
+                String[] zipCodeStringArray = zipCodeString.split(",");
+                String prePreparedStatementString = "insert into zip_code_table(zip_code, longitude, latitude) values (?, ?, ?)";
+                zipCodePreparedStatment = this.swingLeftDatabaseConnection.prepareStatement(prePreparedStatementString);
+                zipCodePreparedStatment.setString(1, zipCodeStringArray[0]);
+                zipCodePreparedStatment.setDouble(2, Double.parseDouble(zipCodeStringArray[1].trim()));
+                zipCodePreparedStatment.setDouble(3, Double.parseDouble(zipCodeStringArray[2].trim()));
+                zipCodePreparedStatment.executeUpdate();
+            }
+            this.swingLeftDatabaseConnection.commit();
+            zipCodePreparedStatment.close();
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
+        return true;
+    }
+
+
     //Takes the data about people and creates entries into the person_table.
     public boolean addDataToPersonTable(List<String> personNamesList) {
         try {
