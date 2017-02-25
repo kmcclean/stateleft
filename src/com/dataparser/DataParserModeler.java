@@ -9,11 +9,11 @@ import java.util.*;
 import java.util.Date;
 import java.util.stream.Stream;
 
-public class dataParserModeler {
+public class DataParserModeler {
 
     Connection swingLeftDatabaseConnection = null;
 
-    dataParserModeler(String db_connect_str, String db_userid, String db_password) {
+    DataParserModeler(String db_connect_str, String db_userid, String db_password) {
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
             this.swingLeftDatabaseConnection = DriverManager.getConnection(db_connect_str, db_userid, db_password);
@@ -102,27 +102,52 @@ public class dataParserModeler {
         return true;
     }
 
+    public boolean updateMinnesotaDistrictName(){
+        PreparedStatement updateMNPreparedStatment = null;
+        ResultSet minnesotDistrictsResultsSet = getTableData("district_table", "state", "MN");
+        List<String> newUpperDistrictNameStrings = new ArrayList<>();
+        List<String> newLowerDistrictNameStrings = new ArrayList<>();
+        try {
+            while(minnesotDistrictsResultsSet.next()) {
+                if(minnesotDistrictsResultsSet.getString("district_type").equals("Upper")){
+                    String[] nameArray = minnesotDistrictsResultsSet.getString("district_name").split(" ");
+                    String newNameString = "UPDATE district_table SET district_name = 'State Senate District " + nameArray[nameArray.length-1] + "' WHERE district_id = " + minnesotDistrictsResultsSet.getInt("district_id");
+                    newUpperDistrictNameStrings.add(newNameString);
+                }
+                else{
+                    String[] nameArray = minnesotDistrictsResultsSet.getString("district_name").split(" ");
+                    String newNameString = "UPDATE district_table SET district_name = 'State House District " + nameArray[nameArray.length-1] + "' WHERE district_id = " + minnesotDistrictsResultsSet.getInt("district_id");
+                    newLowerDistrictNameStrings.add(newNameString);
+                }
+            }
+            for (String prePreparedStatementString: newUpperDistrictNameStrings) {
+                updateMNPreparedStatment = this.swingLeftDatabaseConnection.prepareStatement(prePreparedStatementString);
+                updateMNPreparedStatment.executeUpdate();
+            }
+            for (String prePreparedStatementString: newLowerDistrictNameStrings) {
+                updateMNPreparedStatment = this.swingLeftDatabaseConnection.prepareStatement(prePreparedStatementString);
+                updateMNPreparedStatment.executeUpdate();
+            }
+            this.swingLeftDatabaseConnection.commit();
+            updateMNPreparedStatment.close();
+        }
+        catch (SQLException sqle){
+            System.out.println(sqle.getStackTrace());
+        }
+
+        return true;
+    }
+
     public boolean updateMinnesotaLocations() {
         PreparedStatement upperHousePreparedStatment = null;
-        int counter = 0;
         try (Stream<String> stream = Files.lines(Paths.get("data/district_info/upper_house_info.txt"))) {
             Object[] stringArray = stream.toArray();
             upperHousePreparedStatment = null;
             for (Object upperHouseObject : stringArray) {
+
                 String upperHouseString = upperHouseObject.toString();
                 String[] upperHouseStringArray = upperHouseString.split(",");
-                if (!upperHouseStringArray[0].equals("MN")) {
-                    counter++;
-                    String prePreparedStatementString = "insert into district_table(state, district_name, district_type, longitude, latitude) values (?, ?, ?, ?, ?)";
-                    upperHousePreparedStatment = this.swingLeftDatabaseConnection.prepareStatement(prePreparedStatementString);
-                    upperHousePreparedStatment.setString(1, upperHouseStringArray[0]);
-                    upperHousePreparedStatment.setString(2, upperHouseStringArray[1]);
-                    upperHousePreparedStatment.setString(3, upperHouseStringArray[2]);
-                    upperHousePreparedStatment.setDouble(4, Double.parseDouble(upperHouseStringArray[3].trim()));
-                    upperHousePreparedStatment.setDouble(5, Double.parseDouble(upperHouseStringArray[4].trim()));
-                    upperHousePreparedStatment.executeUpdate();
-                } else {
-                    counter++;
+                if (upperHouseStringArray[0].equals("MN")) {
                     String prePreparedStatementString = "UPDATE district_table SET longitude = ?, latitude = ? WHERE district_name = ?";
                     upperHousePreparedStatment = this.swingLeftDatabaseConnection.prepareCall(prePreparedStatementString);
                     upperHousePreparedStatment.setDouble(1, Double.parseDouble(upperHouseStringArray[3].trim()));
@@ -134,7 +159,6 @@ public class dataParserModeler {
             this.swingLeftDatabaseConnection.commit();
             upperHousePreparedStatment.close();
         } catch (Exception e) {
-            System.out.println("Fault on line " + counter + ".");
             System.out.println(e);
             return false;
         }
@@ -371,9 +395,6 @@ public class dataParserModeler {
             tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementString);
             tableDataPreparedStatement.setString(1, whereValue);
             tableDataResultSet = tableDataPreparedStatement.executeQuery();
-            while(tableDataResultSet.next()){
-                System.out.println(tableDataResultSet.getString("district_name"));
-            }
         }
         catch (SQLException sqle){
             System.out.println(sqle);
@@ -423,6 +444,38 @@ public class dataParserModeler {
         }
         return tableDataResultSet;
     }
+
+    public ResultSet getTableDataTwoFields(String tableName, String whereColumn, String whereValue, String fieldOne, String fieldTwo){
+        ResultSet tableDataResultSet = null;
+        try{
+            String sqlStatementString = "SELECT " +fieldOne + ", " + fieldTwo + " FROM " + tableName + " WHERE " + whereColumn +" LIKE ?";
+            PreparedStatement tableDataPreparedStatement;
+            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementString);
+            tableDataPreparedStatement.setString(1, whereValue);
+            tableDataResultSet = tableDataPreparedStatement.executeQuery();
+
+        }
+        catch (SQLException sqle){
+            System.out.println(sqle);
+        }
+        return tableDataResultSet;
+    }
+
+    public ResultSet getCompetitiveRaces(){
+        ResultSet tableDataResultSet = null;
+        try{
+            String sqlStatementString = "SELECT * FROM district_table JOIN candidate_table ON district_table.district_id = candidate_table.district_id WHERE result like 'Won' AND candidate_table.result_percentage < 55 AND party_id = 6";
+            PreparedStatement tableDataPreparedStatement;
+            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementString);
+            tableDataResultSet = tableDataPreparedStatement.executeQuery();
+        }
+        catch (SQLException sqle){
+            System.out.println(sqle);
+        }
+        return tableDataResultSet;
+    }
+
+
 
     public Connection addDataToDistrictTable(String db_connect_str, String db_userid, String db_password) {
         Connection conn = null;

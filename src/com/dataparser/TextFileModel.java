@@ -10,7 +10,7 @@ import java.util.StringJoiner;
 import java.util.stream.Stream;
 
 
-public class textFileModel {
+public class TextFileModel {
 
     public static HashMap getMinnesotaSenateElectionResults() {
         HashMap<String, List> electionDataHashMap = new HashMap();
