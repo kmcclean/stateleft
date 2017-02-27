@@ -17,6 +17,14 @@ public class DataParserController {
         this.dataModel = startupDatabase();
     }
 
+    public boolean zipCodeAddStates(){
+
+        List zipCodesStatesList = new ArrayList();
+        HashMap zipCodesStatesHashMap = new HashMap();
+
+        return true;
+    }
+
     public List<List> getZipCodeLatLong(String value){
         ResultSet tableDataResultSet = this.dataModel.getTableData("zip_code_table", "zip_code", value);
         List<List> tableResultsList = new ArrayList<>();

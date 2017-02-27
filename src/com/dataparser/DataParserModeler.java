@@ -36,6 +36,26 @@ public class DataParserModeler {
         return true;
     }
 
+    public boolean updateTable(List<HashMap> updateList){
+        try{
+            PreparedStatement updatePreparedStatment = null;
+            for(HashMap updateHashMap: updateList) {
+                String updateString = "UPDATE " + updateHashMap.get("tableName") + " SET " + updateHashMap.get("fieldName") + " WHERE " + updateHashMap.get("whereColumn") + " = ?";
+                updatePreparedStatment = this.swingLeftDatabaseConnection.prepareCall(updateString);
+                updatePreparedStatment.setInt(1, (Integer) updateHashMap.get("whereValue"));
+                updatePreparedStatment.executeUpdate();
+            }
+            this.swingLeftDatabaseConnection.commit();
+            updatePreparedStatment.close();
+
+        }
+        catch (SQLException sqle){
+            System.out.println(sqle);
+            return false;
+        }
+        return true;
+    }
+
     //Takes the data about people and creates entries into the political_party table. If the party already exists, then it doesn't add it.
     public boolean addDataToPartyTable(List<String> politicalPartyList){
 
