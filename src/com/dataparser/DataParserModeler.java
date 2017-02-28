@@ -39,17 +39,18 @@ public class DataParserModeler {
     public boolean updateTable(List<HashMap> updateList){
         try{
             PreparedStatement updatePreparedStatment = null;
-            for(HashMap updateHashMap: updateList) {
-                String updateString = "UPDATE " + updateHashMap.get("tableName") + " SET " + updateHashMap.get("fieldName") + " WHERE " + updateHashMap.get("whereColumn") + " = ?";
+            for(HashMap<String, String> updateHashMap: updateList) {
+                String updateString = "UPDATE " + updateHashMap.get("tableName") + " SET " + updateHashMap.get("fieldName") + " WHERE " + updateHashMap.get("whereColumn") + " LIKE '?'";
                 updatePreparedStatment = this.swingLeftDatabaseConnection.prepareCall(updateString);
-                updatePreparedStatment.setInt(1, (Integer) updateHashMap.get("whereValue"));
+                System.out.println(updateHashMap.get("whereValue"));
+                updatePreparedStatment.setString(1, updateHashMap.get("whereValue"));
                 updatePreparedStatment.executeUpdate();
             }
             this.swingLeftDatabaseConnection.commit();
             updatePreparedStatment.close();
-
         }
         catch (SQLException sqle){
+            sqle.printStackTrace();
             System.out.println(sqle);
             return false;
         }
@@ -233,7 +234,7 @@ public class DataParserModeler {
             for (Object zipCodeObject : stringArray) {
                 String zipCodeString = zipCodeObject.toString();
                 String[] zipCodeStringArray = zipCodeString.split(",");
-                String prePreparedStatementString = "insert into zip_code_table(zip_code, longitude, latitude) values (?, ?, ?)";
+                String prePreparedStatementString = "insert into zip_code_table(zip_code, latitude, longitude) values (?, ?, ?)";
                 zipCodePreparedStatment = this.swingLeftDatabaseConnection.prepareStatement(prePreparedStatementString);
                 zipCodePreparedStatment.setString(1, zipCodeStringArray[0]);
                 zipCodePreparedStatment.setDouble(2, Double.parseDouble(zipCodeStringArray[1].trim()));
@@ -487,6 +488,21 @@ public class DataParserModeler {
             String sqlStatementString = "SELECT * FROM district_table JOIN candidate_table ON district_table.district_id = candidate_table.district_id WHERE result like 'Won' AND candidate_table.result_percentage < 55 AND party_id = 6";
             PreparedStatement tableDataPreparedStatement;
             tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementString);
+            tableDataResultSet = tableDataPreparedStatement.executeQuery();
+        }
+        catch (SQLException sqle){
+            System.out.println(sqle);
+        }
+        return tableDataResultSet;
+    }
+
+    public ResultSet getCompetitiveRaces(String chamber){
+        ResultSet tableDataResultSet = null;
+        try{
+            String sqlStatementString = "SELECT * FROM district_table JOIN candidate_table ON district_table.district_id = candidate_table.district_id WHERE result like 'Won' AND candidate_table.result_percentage < 55 AND party_id = 6 AND district_type = ?";
+            PreparedStatement tableDataPreparedStatement;
+            tableDataPreparedStatement = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementString);
+            tableDataPreparedStatement.setString(1, chamber);
             tableDataResultSet = tableDataPreparedStatement.executeQuery();
         }
         catch (SQLException sqle){

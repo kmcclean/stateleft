@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Stream;
 
 public class DataParserController {
@@ -17,24 +18,16 @@ public class DataParserController {
         this.dataModel = startupDatabase();
     }
 
-    public boolean zipCodeAddStates(){
-
-        List zipCodesStatesList = new ArrayList();
-        HashMap zipCodesStatesHashMap = new HashMap();
-
-        return true;
-    }
-
-    public List<List> getZipCodeLatLong(String value){
-        ResultSet tableDataResultSet = this.dataModel.getTableData("zip_code_table", "zip_code", value);
-        List<List> tableResultsList = new ArrayList<>();
+    public HashMap getZipCodeLatLong(String zipCode){
+        ResultSet tableDataResultSet = this.dataModel.getTableData("zip_code_table", "zip_code", zipCode);
+        List<HashMap> tableResultsHashMapList = new ArrayList<>();
+        HashMap tableResultsHashMap = new HashMap();
         try {
             while (tableDataResultSet.next()) {
-                List<String> rowList = new ArrayList<>();
-                for(int i = 1;  i <= tableDataResultSet.getMetaData().getColumnCount(); i++){
-                    rowList.add(tableDataResultSet.getString(i));
-                }
-                tableResultsList.add(rowList);
+                tableResultsHashMap.put("zip_code", tableDataResultSet.getString("zip_code"));
+                tableResultsHashMap.put("latitude", tableDataResultSet.getDouble("latitude"));
+                tableResultsHashMap.put("longitude", tableDataResultSet.getDouble("longitude"));
+                tableResultsHashMapList.add(tableResultsHashMap);
             }
         }
         catch (SQLException sqle){
@@ -42,32 +35,34 @@ public class DataParserController {
             System.out.println(sqle);
         }
 
-        return tableResultsList;
+        return tableResultsHashMap;
     }
 
-    public HashMap getClosestCompetitiveSeat(List<String> zipCodeList){
-        System.out.println("Longitude: " + zipCodeList.get(2));
-        System.out.println("Latitude: " + zipCodeList.get(1));
-        Haversine haversine = new Haversine();
+    public HashMap getClosestCompetitiveSeat(String zipCodeInputString){
+        HashMap zipCoordinatesHashMap = getZipCodeLatLong(zipCodeInputString);
         ResultSet tableDataResultSet = this.dataModel.getCompetitiveRaces();
+        HashMap closestSeatHashMap = parseResults(tableDataResultSet, (Double) (zipCoordinatesHashMap.get("latitude")), (Double) (zipCoordinatesHashMap.get("longitude")));
+        return closestSeatHashMap;
+    }
+
+    public HashMap getClosestCompetitiveSeat(String zipCodeInputString, String chamber){
+        HashMap zipCoordinatesHashMap = getZipCodeLatLong(zipCodeInputString);
+        ResultSet tableDataResultSet = this.dataModel.getCompetitiveRaces(chamber);
+        HashMap closestSeatHashMap = parseResults(tableDataResultSet, (Double) (zipCoordinatesHashMap.get("latitude")), (Double) (zipCoordinatesHashMap.get("longitude")));
+        return closestSeatHashMap;
+    }
+
+    public HashMap parseResults(ResultSet tableDataResultSet, Double zipLat, Double zipLong){
+        HashMap<String, String> competitiveSeat = new HashMap();
         Double closestSeatDistance = Double.MAX_VALUE;
-        Double zipLong = Double.parseDouble(zipCodeList.get(1));
-        Double zipLat = Double.parseDouble(zipCodeList.get(2));
-        HashMap closestSeatHashMap = new HashMap();
         try {
             while (tableDataResultSet.next()) {
-                System.out.println(tableDataResultSet.getString("district_name"));
-                System.out.println("Latitude: " + tableDataResultSet.getString("latitude"));
-                System.out.println("Longitude: " + tableDataResultSet.getString("longitude"));
-                Double seatLong = tableDataResultSet.getDouble("longitude");
-                Double seatLat = tableDataResultSet.getDouble("latitude");
-                Double distance = haversine.getDistance(zipLat, zipLong, seatLat, seatLong);
-                System.out.println(distance.toString() + "\n");
+                Double distance = getHaversineDistance(zipLat, zipLong, tableDataResultSet.getDouble("latitude"), tableDataResultSet.getDouble("longitude"));
                 if (closestSeatDistance > distance){
                     closestSeatDistance = distance;
-                    closestSeatHashMap.clear();
-                    closestSeatHashMap.put("state", tableDataResultSet.getString("state"));
-                    closestSeatHashMap.put("district_name", tableDataResultSet.getString("district_name"));
+                    competitiveSeat.clear();
+                    competitiveSeat.put("state", tableDataResultSet.getString("state"));
+                    competitiveSeat.put("district_name", tableDataResultSet.getString("district_name"));
 
                 }
             }
@@ -76,64 +71,23 @@ public class DataParserController {
             sqle.printStackTrace();
             System.out.println(sqle);
         }
-        return closestSeatHashMap;
+        return competitiveSeat;
     }
 
-    public HashMap getClosestHouseSeat(List<String> zipCodeList){
-        Haversine haversine = new Haversine();
-        ResultSet tableDataResultSet = this.dataModel.getTableData("district_table", "district_type", "Lower");
-        Double closestSeatDistance = Double.MAX_VALUE;
-        Double zipLong = Double.parseDouble(zipCodeList.get(2));
-        Double zipLat = Double.parseDouble(zipCodeList.get(1));
-        HashMap closestSeatHashMap = new HashMap();
-        try {
-            while (tableDataResultSet.next()) {
-                Double seatLong = tableDataResultSet.getDouble("longitude");
-                Double seatLat = tableDataResultSet.getDouble("latitude");
-                Double distance = haversine.getDistance(zipLat, zipLong, seatLat, seatLong);
-                if (closestSeatDistance > distance){
-                    closestSeatDistance = distance;
-                    closestSeatHashMap.clear();
-                    closestSeatHashMap.put("state", tableDataResultSet.getString("state"));
-                    closestSeatHashMap.put("district_name", tableDataResultSet.getString("district_name"));
+    //From https://bigdatanerd.wordpress.com/2011/11/03/java-implementation-of-haversine-formula-for-distance-calculation-between-two-points/
+    public Double getHaversineDistance(double lat1, double lon1, double lat2, double lon2) {
 
-                }
-            }
-        }
-        catch(SQLException sqle){
-            sqle.printStackTrace();
-            System.out.println(sqle);
-        }
-        return closestSeatHashMap;
+        int R = 6371;
+        Double latDistance = Math.toRadians(lat2-lat1);
+        Double lonDistance = Math.toRadians(lon2-lon1);
+        Double lon1Radians = Math.toRadians(lat1);
+        Double lon2Radians = Math.toRadians(lat2);
+
+        Double a = Math.pow(Math.sin(latDistance / 2), 2) + Math.pow(Math.sin(lonDistance/2), 2) * Math.cos(lon1Radians) * Math.cos(lon2Radians);
+        Double c = 2 * Math.asin(Math.sqrt(a));
+        return R * c;
     }
 
-    public HashMap getClosestSenateSeat(List<String> zipCodeList){
-        Haversine haversine = new Haversine();
-        ResultSet tableDataResultSet = this.dataModel.getTableData("district_table", "district_type", "Upper");
-        Double closestSeatDistance = Double.MAX_VALUE;
-        Double zipLong = Double.parseDouble(zipCodeList.get(2));
-        Double zipLat = Double.parseDouble(zipCodeList.get(1));
-        HashMap closestSeatHashMap = new HashMap();
-        try {
-            while (tableDataResultSet.next()) {
-                Double seatLong = tableDataResultSet.getDouble("longitude");
-                Double seatLat = tableDataResultSet.getDouble("latitude");
-                Double distance = haversine.getDistance(zipLat, zipLong, seatLat, seatLong);
-                if (closestSeatDistance > distance){
-                    closestSeatDistance = distance;
-                    closestSeatHashMap.clear();
-                    closestSeatHashMap.put("state", tableDataResultSet.getString("state"));
-                    closestSeatHashMap.put("district_name", tableDataResultSet.getString("district_name"));
-
-                }
-            }
-        }
-        catch(SQLException sqle){
-            sqle.printStackTrace();
-            System.out.println(sqle);
-        }
-        return closestSeatHashMap;
-    }
 
     public DataParserModeler startupDatabase() {
         HashMap<String, String> keysHashMap = getKeys();
@@ -155,5 +109,14 @@ public class DataParserController {
             System.out.println(e);
         }
         return keyHashMap;
+    }
+
+    public boolean closeDatabase(){
+        if(this.dataModel.closeConnection()){
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

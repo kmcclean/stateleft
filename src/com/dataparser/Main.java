@@ -7,8 +7,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 
-            Haversine haversine = new Haversine();
-            haversine.compareResults();
+
+        DataParserController dataParserController = new DataParserController();
 
 
         System.out.printf("Enter zip code: ");
@@ -17,15 +17,21 @@ public class Main {
         String inputString = scanIn.nextLine();
 
         scanIn.close();
+        HashMap closestSeatHashMap = dataParserController.getClosestCompetitiveSeat(inputString);
+        System.out.println("Closest competitive seat is " + closestSeatHashMap.get("district_name") + " in the state of " + closestSeatHashMap.get("state") + ".");
+        HashMap closestHouseSeatHashMap = dataParserController.getClosestCompetitiveSeat(inputString, "Lower");
+        System.out.println("Closest competitive House seat is " + closestHouseSeatHashMap.get("district_name") + " in the state of " + closestHouseSeatHashMap.get("state") + ".");
+        HashMap closestUpperSeatHashMap = dataParserController.getClosestCompetitiveSeat(inputString, "Upper");
+        System.out.println("Closest competitive Senate seat is " + closestUpperSeatHashMap.get("district_name") + " in the state of " + closestUpperSeatHashMap.get("state") + ".");
 
-        DataParserController dataParserController = new DataParserController();
 
 
-        List<List>zipCoordinates = dataParserController.getZipCodeLatLong(inputString);
 
-        for (List<String> zipCodeList : zipCoordinates){
-            HashMap closestSeatHashMap = dataParserController.getClosestCompetitiveSeat(zipCodeList);
-            System.out.println("Closest competitive seat is " + closestSeatHashMap.get("district_name") + " in the state of " + closestSeatHashMap.get("state") + ".");
+        if(dataParserController.closeDatabase()){
+            System.out.println("Database successfully closed.");
+        }
+        else{
+            System.out.println("Database did not close.");
         }
     }
 
