@@ -1,8 +1,7 @@
 package com.dataparser;
 
-/**
- * Created by kevin on 2/22/17.
- */
+//This class was originally designed to take information about the candidates and put them into a class that could be
+//However, it is no longer used, as converting the data to a CSV file has proven more successful.
 public class Candidate {
     private String candidatePartyString;
     private String candidateNameString;
@@ -12,12 +11,9 @@ public class Candidate {
     private String candidateDistrictString;
 
     Candidate(String party, String name, String votes, String percentage, String district){
-        String trimmedName = name.trim();
-        this.candidateNameString = trimmedName;
-        String trimmedParty = party.trim();
-        this.candidatePartyString = trimmedParty;
-        String trimmedVotes = votes.trim();
-        this.candidateVotesString = Integer.parseInt(trimmedVotes);
+        this.candidateNameString = name.trim();
+        this.candidatePartyString = party.trim();
+        this.candidateVotesString = Integer.parseInt(votes.trim());
         this.candidatePercentageDouble = Double.parseDouble(percentage.replaceAll("%",""));
         if(candidatePercentageDouble >= 50){
             this.candidateResultString = "Won";
@@ -25,8 +21,7 @@ public class Candidate {
         else {
             this.candidateResultString = "Lost";
         }
-        String trimmedDistrict = district.trim();
-        this.candidateDistrictString = trimmedDistrict;
+        this.candidateDistrictString = district.trim();
     }
 
     public Double getCandidatePercentageDouble() {

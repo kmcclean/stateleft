@@ -1,0 +1,84 @@
+6,"State Senator, Dist 1 ",6,"OF",,667,179,361,1,0,0,749917,9,9,27,"(D) KAHELE, Kaiali'i",2,"",7319,2083,5086,14488
+6,"State Senator, Dist 1 ",6,"OF",,667,179,361,1,0,0,749917,9,9,28,"(L) ARIANOFF, Kimberly",1,"",794,297,725,1816
+7,"State Senator, Dist 2 ",7,"OF",,479,124,459,1,1,2,749917,10,10,29,"(D) RUDERMAN, Russell E.",2,"",4988,1541,5135,11664
+7,"State Senator, Dist 2 ",7,"OF",,479,124,459,1,1,2,749917,10,10,30,"(L) FOGEL, Frederick F.",1,"",1020,323,1145,2488
+8,"State Senator, Dist 9",8,"OF",,564,92,494,4,1,6,749917,9,9,31,"(D) CHANG, Stanley",1,"",6731,1003,5699,13433
+8,"State Senator, Dist 9",8,"OF",,564,92,494,4,1,6,749917,9,9,32,"(R) SLOM, Sam M.",2,"",5973,863,5149,11985
+9,"State Senator, Dist 10",9,"OF",,1475,251,1498,1,0,5,749917,10,10,33,"(D) IHARA, Les",1,"",6774,1158,5913,13845
+9,"State Senator, Dist 10",9,"OF",,1475,251,1498,1,0,5,749917,10,10,34,"(L) PHILLIPS, Arnold T.",2,"",1144,250,1318,2712
+10,"State Senator, Dist 11",10,"OF",,1067,214,905,4,1,5,749917,11,11,35,"(D) TANIGUCHI, Brian T.",3,"",7409,1390,6144,14943
+10,"State Senator, Dist 11",10,"OF",,1067,214,905,4,1,5,749917,11,11,37,"(R) AMSTERDAM, C. Kaui Jochanan",1,"",1505,314,1597,3416
+10,"State Senator, Dist 11",10,"OF",,1067,214,905,4,1,5,749917,11,11,36,"(L) KENT, Joe",2,"",323,77,391,791
+11,"State Senator, Dist 13",11,"OF",,578,136,398,6,1,9,749917,8,8,38,"(D) RHOADS, Karl",2,"",5612,1126,4077,10815
+11,"State Senator, Dist 13",11,"OF",,578,136,398,6,1,9,749917,8,8,40,"(R) TAM, Rod",3,"",1662,393,1771,3826
+11,"State Senator, Dist 13",11,"OF",,578,136,398,6,1,9,749917,8,8,39,"(L) OZOLS, Harry",1,"",257,73,263,593
+12,"State Senator, Dist 15",12,"OF",,671,84,720,1,0,1,749917,7,7,41,"(D) WAKAI, Glenn",2,"",4316,552,4358,9226
+12,"State Senator, Dist 15",12,"OF",,671,84,720,1,0,1,749917,7,7,42,"(L) KALINOWSKI, Roman",1,"",670,159,882,1711
+13,"State Senator, Dist 19",13,"OF",,279,77,338,3,1,5,749917,6,6,43,"(D) ESPERO, Will",1,"",3305,1153,3422,7880
+13,"State Senator, Dist 19",13,"OF",,279,77,338,3,1,5,749917,6,6,44,"(R) FEVELLA, Kurt",2,"",1725,805,2382,4912
+14,"State Senator, Dist 25",14,"OF",,559,76,625,2,2,3,749917,10,10,45,"(D) THIELEN, Laura H.",2,"",6225,882,7105,14212
+14,"State Senator, Dist 25",14,"OF",,559,76,625,2,2,3,749917,10,10,46,"(R) NAGAMINE, Robert K.",1,"",2674,450,3762,6886
+15,"State Representative, Dist 1",15,"OF",,344,98,337,1,0,2,749917,9,9,47,"(D) NAKASHIMA, Mark M.",1,"",3693,933,2866,7492
+15,"State Representative, Dist 1",15,"OF",,344,98,337,1,0,2,749917,9,9,48,"(R) YOUNG, Byron",2,"",746,250,925,1921
+16,"State Representative, Dist 3",16,"OF",,332,109,338,2,0,5,749917,7,7,49,"(D) ONISHI, Richard H.K.",2,"",2965,848,2371,6184
+16,"State Representative, Dist 3",16,"OF",,332,109,338,2,0,5,749917,7,7,50,"(G) PISCIOTTA, Kealoha",3,"",507,194,632,1333
+16,"State Representative, Dist 3",16,"OF",,332,109,338,2,0,5,749917,7,7,51,"(L) ARIANOFF, Gregory",1,"",328,116,369,813
+17,"State Representative, Dist 4",17,"OF",,368,116,416,4,1,2,749917,4,4,53,"(D) SAN BUENAVENTURA, Joy A.",2,"",2613,727,2506,5846
+17,"State Representative, Dist 4",17,"OF",,368,116,416,4,1,2,749917,4,4,54,"(N) JONES, Luana",1,"",409,151,687,1247
+17,"State Representative, Dist 4",17,"OF",,368,116,416,4,1,2,749917,4,4,52,"(C) STEPHENS, Moke",3,"",268,61,319,648
+18,"State Representative, Dist 5",18,"OF",,468,156,482,0,0,0,749917,8,8,55,"(D) CREAGAN, Richard P.",1,"",2794,840,2542,6176
+18,"State Representative, Dist 5",18,"OF",,468,156,482,0,0,0,749917,8,8,56,"(L) LAST, Michael L.",2,"",675,284,807,1766
+19,"State Representative, Dist 6",19,"OF",,145,89,122,1,0,1,749917,5,5,57,"(D) LOWEN, Nicole E.",1,"",2498,1345,2170,6013
+19,"State Representative, Dist 6",19,"OF",,145,89,122,1,0,1,749917,5,5,58,"(R) PRATT, Bruce C.",2,"",1086,654,1156,2896
+20,"State Representative, Dist 7",20,"OF",,175,84,171,1,0,0,749917,5,5,59,"(D) EVANS, Cindy",2,"",2510,1111,2313,5934
+20,"State Representative, Dist 7",20,"OF",,175,84,171,1,0,0,749917,5,5,60,"(R) COAKLEY, Jeffrey (Jeff)",1,"",1332,629,1620,3581
+21,"State Representative, Dist 8",21,"OF",,356,89,235,0,0,3,749917,7,7,61,"(D) SOUKI, Joe",2,"",3254,760,2500,6514
+21,"State Representative, Dist 8",21,"OF",,356,89,235,0,0,3,749917,7,7,62,"(R) REBOLLEDO, Gilbert (Gil)",1,"",1096,293,1186,2575
+22,"State Representative, Dist 10",22,"OF",,208,49,391,4,0,0,749917,5,5,63,"(D) MCKELVEY, Angus L.K.",2,"",1648,268,2800,4716
+22,"State Representative, Dist 10",22,"OF",,208,49,391,4,0,0,749917,5,5,64,"(R) MARTEN, Chayne",1,"",496,110,1094,1700
+23,"State Representative, Dist 11",23,"OF",,177,61,256,0,0,1,749917,4,4,65,"(D) ING, Kaniela",1,"",2137,627,3071,5835
+23,"State Representative, Dist 11",23,"OF",,177,61,256,0,0,1,749917,4,4,66,"(R) PEKUS, Daniel A. (Danny)",2,"",906,260,1335,2501
+24,"State Representative, Dist 13",24,"OF",,225,52,354,1,1,2,749917,9,9,67,"(D) DECOITE, Lynn",1,"",2019,806,2999,5824
+24,"State Representative, Dist 13",24,"OF",,225,52,354,1,1,2,749917,9,9,68,"(G) NIKHILANANDA, Nick",2,"",863,282,1628,2773
+25,"State Representative, Dist 14",25,"OF",,277,117,485,3,0,12,749917,5,5,69,"(D) NAKAMURA, Nadine K.",2,"",2298,909,2850,6057
+25,"State Representative, Dist 14",25,"OF",,277,117,485,3,0,12,749917,5,5,70,"(R) COMBS, Sandra A. (Sandi)",1,"",677,367,1257,2301
+26,"State Representative, Dist 16",26,"OF",,297,103,434,1,0,3,749917,6,6,71,"(D) MORIKAWA, Dee",2,"",2543,806,2739,6088
+26,"State Representative, Dist 16",26,"OF",,297,103,434,1,0,3,749917,6,6,72,"(R) FRANKS, Victoria (Vickie)",1,"",711,221,1002,1934
+27,"State Representative, Dist 17",27,"OF",,499,49,444,2,0,4,749917,4,4,74,"(R) WARD, Gene",2,"",4006,557,3697,8260
+27,"State Representative, Dist 17",27,"OF",,499,49,444,2,0,4,749917,4,4,73,"(D) ROSS, Karlen",1,"",1407,241,1210,2858
+28,"State Representative, Dist 19",28,"OF",,700,86,650,2,1,3,749917,5,5,75,"(D) KOBAYASHI, Bertrand (Bert)",3,"",3052,475,2349,5876
+28,"State Representative, Dist 19",28,"OF",,700,86,650,2,1,3,749917,5,5,77,"(R) BISCHOFF, Stephen N.",1,"",984,145,853,1982
+28,"State Representative, Dist 19",28,"OF",,700,86,650,2,1,3,749917,5,5,76,"(L) HIGA, Anthony J.L.",2,"",563,87,523,1173
+29,"State Representative, Dist 20",29,"OF",,512,88,537,1,0,0,749917,4,4,78,"(D) SAY, Calvin K.Y.",2,"",3115,525,2826,6466
+29,"State Representative, Dist 20",29,"OF",,512,88,537,1,0,0,749917,4,4,79,"(R) ALLEN, Julia E.",1,"",1240,261,1280,2781
+30,"State Representative, Dist 22",30,"OF",,300,88,276,0,0,1,749917,3,3,80,"(D) BROWER, Tom",1,"",1973,593,1648,4214
+30,"State Representative, Dist 22",30,"OF",,300,88,276,0,0,1,749917,3,3,81,"(R) HENSKI, Kathryn",2,"",956,310,959,2225
+31,"State Representative, Dist 24",31,"OF",,557,99,519,1,0,0,749917,4,4,82,"(D) BELATTI, Della Au",1,"",2693,589,2223,5505
+31,"State Representative, Dist 24",31,"OF",,557,99,519,1,0,0,749917,4,4,84,"(R) FENTON, Larry",2,"",717,167,749,1633
+31,"State Representative, Dist 24",31,"OF",,557,99,519,1,0,0,749917,4,4,83,"(L) TIPPENS, Michelle Rose",3,"",240,71,348,659
+32,"State Representative, Dist 28",32,"OF",,84,16,103,0,0,1,749917,4,4,85,"(D) MIZUNO, John M.",2,"",1621,234,2067,3922
+32,"State Representative, Dist 28",32,"OF",,84,16,103,0,0,1,749917,4,4,86,"(R) KAAPU, Carole Kauhiwai",1,"",493,99,647,1239
+33,"State Representative, Dist 29",33,"OF",,337,54,259,0,0,2,749917,4,4,87,"(D) HOLT, Daniel",2,"",1417,236,1336,2989
+33,"State Representative, Dist 29",33,"OF",,337,54,259,0,0,2,749917,4,4,88,"(R) COAKLEY, Kaiwiola",1,"",439,91,353,883
+34,"State Representative, Dist 31",34,"OF",,180,35,221,3,1,2,749917,5,5,89,"(D) JOHANSON, Aaron Ling",2,"",1765,280,2125,4170
+34,"State Representative, Dist 31",34,"OF",,180,35,221,3,1,2,749917,5,5,90,"(R) CHING, Eric H.L.",1,"",728,126,933,1787
+35,"State Representative, Dist 34",35,"OF",,132,12,115,0,0,5,749917,3,3,91,"(D) TAKAYAMA, Gregg",2,"",3163,313,2135,5611
+35,"State Representative, Dist 34",35,"OF",,132,12,115,0,0,5,749917,3,3,92,"(R) AGUSTIN, Jaci",1,"",1690,227,2280,4197
+36,"State Representative, Dist 35",36,"OF",,161,17,166,2,0,2,749917,6,6,93,"(D) TAKUMI, Roy M.",2,"",1935,226,1982,4143
+36,"State Representative, Dist 35",36,"OF",,161,17,166,2,0,2,749917,6,6,94,"(R) CLEMENTE, Roger",1,"",734,131,1148,2013
+37,"State Representative, Dist 36",37,"OF",,133,28,106,1,0,5,749917,3,3,96,"(R) FUKUMOTO CHANG, Beth",1,"",2869,392,3531,6792
+37,"State Representative, Dist 36",37,"OF",,133,28,106,1,0,5,749917,3,3,95,"(D) LEE, Marilyn B.",2,"",1505,243,1526,3274
+38,"State Representative, Dist 37",38,"OF",,317,33,317,0,0,3,749917,4,4,97,"(D) YAMANE, Ryan I.",2,"",3711,490,3838,8039
+38,"State Representative, Dist 37",38,"OF",,317,33,317,0,0,3,749917,4,4,98,"(R) KUPUKAA, Katherine T.",1,"",907,174,1373,2454
+39,"State Representative, Dist 40",39,"OF",,158,24,258,2,1,1,749917,4,4,100,"(R) MCDERMOTT, Bob",2,"",1259,408,1861,3528
+39,"State Representative, Dist 40",39,"OF",,158,24,258,2,1,1,749917,4,4,99,"(D) MARTINEZ, Rose",1,"",869,297,1319,2485
+40,"State Representative, Dist 41",40,"OF",,305,55,282,1,1,3,749917,4,4,101,"(D) LOPRESTI, Matthew S. (Matt)",2,"",1922,771,1596,4289
+40,"State Representative, Dist 41",40,"OF",,305,55,282,1,1,3,749917,4,4,102,"(R) JEREMIAH, Bryan E.",1,"",1093,573,1239,2905
+41,"State Representative, Dist 43",41,"OF",,65,17,51,2,0,7,749917,5,5,104,"(R) TUPOLA, Andria",2,"",1277,489,2093,3859
+41,"State Representative, Dist 43",41,"OF",,65,17,51,2,0,7,749917,5,5,103,"(D) ELI, Stacelynn K.M.",1,"",708,254,970,1932
+42,"State Representative, Dist 44",42,"OF",,55,16,50,2,0,3,749917,2,2,105,"(D) GATES, Cedric Asuega",1,"",1124,342,1880,3346
+42,"State Representative, Dist 44",42,"OF",,55,16,50,2,0,3,749917,2,2,106,"(R) PA'ALUHI, Marc K.",2,"",725,179,1087,1991
+43,"State Representative, Dist 46",43,"OF",,113,20,137,3,0,3,749917,4,4,107,"(D) OSHIRO, Marcus R.",2,"",1896,202,2708,4806
+43,"State Representative, Dist 46",43,"OF",,113,20,137,3,0,3,749917,4,4,108,"(R) NOLTIE, Scott A.",1,"",429,74,774,1277
+44,"State Representative, Dist 47",44,"OF",,107,21,160,3,0,7,749917,4,4,109,"(D) QUINLAN, Sean",2,"",1121,179,2242,3542
+44,"State Representative, Dist 47",44,"OF",,107,21,160,3,0,7,749917,4,4,110,"(R) POUHA, Feki",1,"",901,130,2403,3434
