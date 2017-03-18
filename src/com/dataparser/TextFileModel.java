@@ -240,4 +240,23 @@ public class TextFileModel {
 
         return firstName.trim() + "," + middleName.trim() + "," + lastName.trim() + "," + postNominal.trim();
     }
+
+    public String[] getSampleTables(String filePath){
+        Object[] fileObjectArray = fetchTextFile(filePath);
+        String fullString = "";
+        for (Object fileObject: fileObjectArray){
+            fullString += fileObject.toString();
+        }
+        return fullString.split(";");
+    }
+
+    public String[] getSampleColumnNames(String filePath){
+        Object[] fileObjectArray = fetchTextFile(filePath);
+        String fullString = "";
+        for (Object fileObject: fileObjectArray){
+            fullString += fileObject.toString()+"\n";
+        }
+        return fullString.split("\n");
+    }
+
 }

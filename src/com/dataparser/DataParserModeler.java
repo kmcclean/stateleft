@@ -3,17 +3,35 @@ package com.dataparser;
 import java.sql.*;
 import java.util.*;
 
-//This class takes data from the database and turns it over to the controller.
+//This class takes data from the database and gives it to the controller.
 public class DataParserModeler {
 
     Connection swingLeftDatabaseConnection = null;
 
-    //starts up the database when the class is initiated.
-    DataParserModeler(String db_connect_str, String db_userid, String db_password) {
+    //starts up the database when the class is created.
+    DataParserModeler(String dbConnectStr, String dbUserid, String dbPassword) {
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
-            this.swingLeftDatabaseConnection = DriverManager.getConnection(db_connect_str, db_userid, db_password);
+            this.swingLeftDatabaseConnection = DriverManager.getConnection(dbConnectStr, dbUserid, dbPassword);
             this.swingLeftDatabaseConnection.setAutoCommit(false);
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+    DataParserModeler(String jdbcDriver, String dbConnectStr, String dbUserid, String dbPassword, String[] sampleData){
+        try {
+            Class.forName(jdbcDriver).newInstance();
+            Connection createDatabaseConnection = DriverManager.getConnection("jdbc:mysql://localhost/?user=" + dbUserid + "&password=" + dbPassword);
+            Statement createDatabaseStatement = createDatabaseConnection.createStatement();
+            if(createDatabaseStatement.executeUpdate("CREATE DATABASE IF NOT EXISTS sample_database")==0){
+                System.out.println("Sample database created successfully.");
+                if(createSampleTables(sampleData)){
+                    System.out.println("Tables Added Successfully.");
+                }
+            }
+
         }
         catch (Exception e){
             System.out.println(e);
@@ -242,4 +260,20 @@ public class DataParserModeler {
         }
         return tableDataResultSet;
     }
+
+    private boolean createSampleTables(String[] tableList){
+        PreparedStatement createTablePS;
+        try{
+            for(String table : tableList) {
+                createTablePS = this.swingLeftDatabaseConnection.prepareStatement(table);
+                createTablePS.execute();
+            }
+            return true;
+        }
+        catch (SQLException sqle){
+            System.out.println(sqle);
+            return false;
+        }
+    }
+
 }

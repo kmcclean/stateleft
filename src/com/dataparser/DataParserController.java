@@ -17,10 +17,15 @@ import java.util.stream.Stream;
 public class DataParserController {
     DataParserModeler dataModel;
 
-    DataParserController() {
-        this.dataModel = startupDatabase();
+    DataParserController(String dbConnectStr, String keyPath) {
+        this.dataModel = startupDatabase(dbConnectStr, keyPath);
     }
 
+    DataParserController(String jdbcDriver, String dbConnectStr, String keyPath, String[] tableList) {
+        HashMap<String, String> sampleKeys = getKeys(keyPath);
+        this.dataModel = new DataParserModeler(jdbcDriver, dbConnectStr, sampleKeys.get("login"), sampleKeys.get("password"), tableList);
+
+    }
     //This runs the two methods dedicated to adding a new text file to the system.
     public boolean addTextFile(List<HashMap<String, String>> newDataHashMapList){
         if(addDataToPersonTable(newDataHashMapList)){
@@ -181,15 +186,15 @@ public class DataParserController {
 
 
     //This starts the database.
-    public DataParserModeler startupDatabase() {
-        HashMap<String, String> keysHashMap = getKeys();
-        return new DataParserModeler("jdbc:mysql://localhost:3306/swing_left_database", keysHashMap.get("login"), keysHashMap.get("password"));
+    public DataParserModeler startupDatabase(String dbConnectStr, String keyPath) {
+        HashMap<String, String> keysHashMap = getKeys(keyPath);
+        return new DataParserModeler(dbConnectStr, keysHashMap.get("login"), keysHashMap.get("password"));
     }
 
     //Gets the keys used by the database.
-    public HashMap getKeys() {
+    public HashMap<String, String> getKeys(String keyPath) {
         HashMap keyHashMap = new HashMap();
-        try (Stream<String> stream = Files.lines(Paths.get("keys/databaselogin.txt"))) {
+        try (Stream<String> stream = Files.lines(Paths.get(keyPath))) {
             Object[] keyArray = stream.toArray();
 
             for (Object key : keyArray) {
@@ -203,7 +208,7 @@ public class DataParserController {
         return keyHashMap;
     }
 
-    //closes the database.
+   //closes the database.
     public boolean closeDatabase(){
         return this.dataModel.closeConnection();
     }
