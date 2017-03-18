@@ -7,6 +7,7 @@ import java.util.Scanner;
 public class Main {
     //this is designed to allow the user to pick the specific methods they need when running the program.
     public static void main(String[] args) {
+        createSampleDatabase();
         //testSetup("data/staging_folder/staging_file.txt");
         //prepareFile("data/staging_folder/staging_file.txt");
         //addDataToDatabase("data/prepared_data/prepared_file.txt");
@@ -69,5 +70,9 @@ public class Main {
     public static void testSetup(String filePath){
         TextFileModel textFileModel = new TextFileModel();
         textFileModel.testChanges(filePath);
+    }
+
+    public static void createSampleDatabase(){
+        System.out.println(System.getProperty("os.name"));
     }
 }

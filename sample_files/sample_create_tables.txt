@@ -1,0 +1,200 @@
+CREATE TABLE bill_issues_table
+(
+    bill_id INT(11) NOT NULL,
+    issue_id INT(11) NOT NULL,
+    CONSTRAINT `PRIMARY` PRIMARY KEY (bill_id, issue_id)
+);
+CREATE TABLE bill_table
+(
+    bill_id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    bill_name VARCHAR(10),
+    bill_desc VARCHAR(50)
+);
+CREATE TABLE bill_votes_table
+(
+    seat_id INT(11) NOT NULL,
+    bill_id INT(11) NOT NULL,
+    vote ENUM('Yes', 'No', 'Abstain'),
+    CONSTRAINT `PRIMARY` PRIMARY KEY (seat_id, bill_id)
+);
+CREATE TABLE candidate_table
+(
+    candidate_id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    party_id INT(11),
+    website VARCHAR(100),
+    result_percentage DOUBLE,
+    result_votes INT(11),
+    result ENUM('Won', 'Lost'),
+    person_id INT(11),
+    election_cycle_id INT(11),
+    district_id INT(11)
+);
+CREATE TABLE district_table
+(
+    district_id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    state VARCHAR(2),
+    district_name VARCHAR(200),
+    district_type VARCHAR(20),
+    longitude DOUBLE,
+    latitude DOUBLE,
+    last_election_year_fk INT(11),
+    next_election_year_fk INT(11)
+);
+CREATE TABLE election_cycle_table
+(
+    election_cycle_id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    cycle_year INT(11)
+);
+CREATE TABLE grades_table
+(
+    person_id INT(11) NOT NULL,
+    org_id INT(11) NOT NULL,
+    grade_year DATE NOT NULL,
+    grade VARCHAR(50),
+    CONSTRAINT `PRIMARY` PRIMARY KEY (person_id, org_id)
+);
+CREATE TABLE issue_organization_table
+(
+    org_id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    org_name INT(11),
+    issue_id INT(11)
+);
+CREATE TABLE issues_table
+(
+    issue_id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    issue_name VARCHAR(50)
+);
+CREATE TABLE legislature_seats_table
+(
+    seat_id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    district_id INT(11),
+    elected_date DATE,
+    in_office ENUM('Yes', 'No'),
+    official_website VARCHAR(100),
+    party_id INT(11),
+    person_id INT(11)
+);
+CREATE TABLE national_political_party_table
+(
+    party_id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    party_name VARCHAR(100)
+);
+CREATE TABLE organization_bill_support_table
+(
+    bill_id INT(11) NOT NULL,
+    org_id INT(11) NOT NULL,
+    support_oppose ENUM('Support', 'Oppose'),
+    CONSTRAINT `PRIMARY` PRIMARY KEY (bill_id, org_id)
+);
+CREATE TABLE person_table
+(
+    person_id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    middle_name VARCHAR(50),
+    post_nominal VARCHAR(50),
+    state VARCHAR(50)
+);
+CREATE TABLE state_parties_table
+(
+    state_party_id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    party_id INT(11) NOT NULL,
+    state VARCHAR(2) NOT NULL,
+    website VARCHAR(200),
+    state_party_name VARCHAR(100),
+    column_6 INT(11)
+);
+CREATE TABLE zip_code_table
+(
+    zip_code VARCHAR(10) PRIMARY KEY NOT NULL,
+    latitude DOUBLE NOT NULL,
+    longitude DOUBLE NOT NULL,
+    state VARCHAR(2)
+);
+CREATE TABLE close_republican_wins
+(
+    district_name VARCHAR(200),
+    Republican VARCHAR(101),
+    Votes INT(11),
+    Percentage DOUBLE,
+    Difference BIGINT(12),
+    state VARCHAR(2)
+);
+CREATE TABLE pulled_seats
+(
+    district_name VARCHAR(200),
+    Candidate VARCHAR(101),
+    Votes INT(11),
+    Percentage DOUBLE,
+    Difference BIGINT(12),
+    state VARCHAR(2)
+);
+CREATE TABLE race_view
+(
+    district_name VARCHAR(200),
+    `Candidate 1` VARCHAR(101),
+    `Votes 1` INT(11),
+    `Percentage 1` DOUBLE,
+    `Candidate 2` VARCHAR(101),
+    `Votes 2` INT(11),
+    `Percentage 2` DOUBLE
+);
+CREATE TABLE races_without_democrats
+(
+    district_name VARCHAR(200),
+    candidate_id INT(11) NOT NULL
+);
+CREATE TABLE seats_democrats_lost_view
+(
+    district_name VARCHAR(200)
+);
+CREATE TABLE seats_democrats_won_view
+(
+    district_name VARCHAR(200)
+);
+ALTER TABLE bill_issues_table ADD FOREIGN KEY (issue_id) REFERENCES issues_table (issue_id);
+ALTER TABLE bill_issues_table ADD FOREIGN KEY (bill_id) REFERENCES bill_table (bill_id);
+CREATE INDEX bill_issues_table_issues_table_issue_id_fk ON bill_issues_table (issue_id);
+CREATE UNIQUE INDEX bill_table_bill_id_uindex ON bill_table (bill_id);
+ALTER TABLE bill_votes_table ADD FOREIGN KEY (seat_id) REFERENCES legislature_seats_table (seat_id);
+ALTER TABLE bill_votes_table ADD FOREIGN KEY (bill_id) REFERENCES bill_table (bill_id);
+CREATE INDEX bill_votes_table_bill_table_bill_id_fk ON bill_votes_table (bill_id);
+ALTER TABLE candidate_table ADD FOREIGN KEY (party_id) REFERENCES national_political_party_table (party_id);
+ALTER TABLE candidate_table ADD FOREIGN KEY (person_id) REFERENCES person_table (person_id);
+ALTER TABLE candidate_table ADD FOREIGN KEY (election_cycle_id) REFERENCES election_cycle_table (election_cycle_id);
+ALTER TABLE candidate_table ADD FOREIGN KEY (district_id) REFERENCES district_table (district_id);
+CREATE INDEX candidate_table_person_table_person_id_fk ON candidate_table (person_id);
+CREATE INDEX candidate_table_political_party_table_party_id_fk ON candidate_table (party_id);
+CREATE UNIQUE INDEX candidate_table_candidate_id_uindex ON candidate_table (candidate_id);
+CREATE INDEX candidate_table_district_table_district_id_fk ON candidate_table (district_id);
+CREATE INDEX candidate_table_election_cycle_table_election_cycle_id_fk ON candidate_table (election_cycle_id);
+ALTER TABLE district_table ADD FOREIGN KEY (next_election_year_fk) REFERENCES election_cycle_table (election_cycle_id);
+ALTER TABLE district_table ADD FOREIGN KEY (last_election_year_fk) REFERENCES election_cycle_table (election_cycle_id);
+CREATE UNIQUE INDEX district_table_district_id_uindex ON district_table (district_id);
+CREATE INDEX district_table_last_election__fk ON district_table (last_election_year_fk);
+CREATE INDEX district_table_next_election_cycle__fk ON district_table (next_election_year_fk);
+CREATE UNIQUE INDEX election_cycle_table_election_cycle_id_uindex ON election_cycle_table (election_cycle_id);
+ALTER TABLE grades_table ADD FOREIGN KEY (person_id) REFERENCES person_table (person_id);
+ALTER TABLE grades_table ADD FOREIGN KEY (org_id) REFERENCES issue_organization_table (org_id);
+CREATE INDEX legislator_grades_table_issue_organization_table_org_id_fk ON grades_table (org_id);
+ALTER TABLE issue_organization_table ADD FOREIGN KEY (issue_id) REFERENCES issues_table (issue_id);
+CREATE INDEX issue_organization_table_issues_table_issue_id_fk ON issue_organization_table (issue_id);
+CREATE UNIQUE INDEX issue_organization_table_org_id_uindex ON issue_organization_table (org_id);
+CREATE UNIQUE INDEX issues_table_issue_id_uindex ON issues_table (issue_id);
+ALTER TABLE legislature_seats_table ADD FOREIGN KEY (person_id) REFERENCES person_table (person_id);
+ALTER TABLE legislature_seats_table ADD FOREIGN KEY (district_id) REFERENCES district_table (district_id);
+ALTER TABLE legislature_seats_table ADD FOREIGN KEY (party_id) REFERENCES national_political_party_table (party_id);
+CREATE UNIQUE INDEX legislature_seats_table_seat_id_uindex ON legislature_seats_table (seat_id);
+CREATE INDEX legislature_seats_table_district_table_district_id_fk ON legislature_seats_table (district_id);
+CREATE INDEX legislature_seats_table_person_table_person_id_fk ON legislature_seats_table (person_id);
+CREATE INDEX legislature_seats_table_political_party_table_party_id_fk ON legislature_seats_table (party_id);
+CREATE UNIQUE INDEX political_party_table_party_id_uindex ON national_political_party_table (party_id);
+ALTER TABLE organization_bill_support_table ADD FOREIGN KEY (bill_id) REFERENCES bill_table (bill_id);
+ALTER TABLE organization_bill_support_table ADD FOREIGN KEY (bill_id) REFERENCES bill_table (bill_id);
+ALTER TABLE organization_bill_support_table ADD FOREIGN KEY (org_id) REFERENCES issue_organization_table (org_id);
+CREATE INDEX org_bill_support_table_issue_org_table_org_id_fk ON organization_bill_support_table (org_id);
+CREATE UNIQUE INDEX person_table_person_id_uindex ON person_table (person_id);
+ALTER TABLE state_parties_table ADD FOREIGN KEY (party_id) REFERENCES national_political_party_table (party_id);
+CREATE INDEX state_parties_table_political_party_table_party_id_fk ON state_parties_table (party_id);
+CREATE UNIQUE INDEX state_parties_table_state_party_id_uindex ON state_parties_table (state_party_id);
+CREATE UNIQUE INDEX zip_code_table_zip_code_uindex ON zip_code_table (zip_code);

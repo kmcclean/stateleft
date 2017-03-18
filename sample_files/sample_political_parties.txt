@@ -1,0 +1,8 @@
+6,Republican Party
+7,Democratic Party
+8,Green Party
+9,Libertarian Party
+10,Independent Progressive Liberal
+14,Independence  
+15,Legal Marijuana Now  
+16,Third Party
