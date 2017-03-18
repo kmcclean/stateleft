@@ -72,6 +72,7 @@ public class Main {
         textFileModel.testChanges(filePath);
     }
 
+    //this will create a sample database and put all the necessary information into it so that it can be used as an example.
     public static void createSampleDatabase() {
 
         String createTablesPath;
@@ -84,11 +85,9 @@ public class Main {
             dataPathsList.add("sample_files\\sample_candidate_table_data.txt");
             dataPathsList.add("sample_files\\sample_district_table_data.txt");
             dataPathsList.add("sample_files\\sample_election_cycle_table_data.txt");
-            dataPathsList.add("sample_files\\sample_legislature_seats_table_data.txt");
             dataPathsList.add("sample_files\\sample_person_table_data.txt");
             dataPathsList.add("sample_files\\sample_national_political_parties_table_data.txt");
             dataPathsList.add("sample_files\\sample_zip_code_table_data.txt");
-            dataPathsList.add("sample_files\\sample_state_parties_table_data");
 
             tableColumns = "sample_files\\tables_columns.txt";
         }
@@ -98,11 +97,9 @@ public class Main {
             dataPathsList.add("sample_files/sample_candidate_table_data.txt");
             dataPathsList.add("sample_files/sample_district_table_data.txt");
             dataPathsList.add("sample_files/sample_election_cycle_table_data.txt");
-            dataPathsList.add("sample_files/sample_legislature_seats_table_data.txt");
             dataPathsList.add("sample_files/sample_person_table_data.txt");
             dataPathsList.add("sample_files/sample_national_political_parties_table_data.txt");
             dataPathsList.add("sample_files/sample_zip_code_table_data.txt");
-            dataPathsList.add("sample_files/sample_state_parties_table_data");
 
             tableColumns = "sample_files/tables_columns.txt";
         }
@@ -110,10 +107,11 @@ public class Main {
         TextFileModel textFileModel = new TextFileModel();
         String[] createTables = textFileModel.getSampleTables(createTablesPath);
         String[] columnsArray = textFileModel.getSampleColumnNames(tableColumns);
+        String currentTable = "";
+        String sqlStatements = "";
         for(String s: createTables){
-            
-        }
-        //DataParserController dataParserController = new DataParserController();
 
+
+        }
     }
 }

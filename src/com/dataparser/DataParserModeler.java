@@ -23,13 +23,47 @@ public class DataParserModeler {
     DataParserModeler(String jdbcDriver, String dbConnectStr, String dbUserid, String dbPassword, String[] sampleData){
         try {
             Class.forName(jdbcDriver).newInstance();
-            Connection createDatabaseConnection = DriverManager.getConnection("jdbc:mysql://localhost/?user=" + dbUserid + "&password=" + dbPassword);
-            Statement createDatabaseStatement = createDatabaseConnection.createStatement();
+            this.swingLeftDatabaseConnection = DriverManager.getConnection("jdbc:mysql://localhost/?user=" + dbUserid + "&password=" + dbPassword);
+            Statement createDatabaseStatement = this.swingLeftDatabaseConnection.createStatement();
             if(createDatabaseStatement.executeUpdate("CREATE DATABASE IF NOT EXISTS sample_database")==0){
                 System.out.println("Sample database created successfully.");
                 if(createSampleTables(sampleData)){
                     System.out.println("Tables Added Successfully.");
+                    if(addSampleDataToElectionCycleTable(sampleData)){
+                        System.out.println("Election Cycle Data Added Successfully.");
+                        if(addSampleDataToPersonTable(sampleData)){
+                            System.out.println("Person Data Added Successfully.");
+                            if(addSampleDataToPartyTable(sampleData)){
+                                System.out.println("Party Data Added Successfully.");
+                                if (addSampleDataToDistrictTable(sampleData)){
+                                    System.out.println("District Data Added Successfully.");
+                                    if(addSampleDataToCandidateTable(sampleData)){
+                                        System.out.println("Sample Candidate Table Added Successfully.");
+                                    }
+                                    else{
+                                        System.out.println("Sample Candidate data addition failed.");
+                                    }
+                                }
+                                else{
+                                    System.out.println("Sample district data addition failed.");
+                                }
+                            }
+                            else{
+                                System.out.println("Party data addition failed.");
+                            }
+                        }
+                        else{
+                            System.out.println("Person data additiona failed.");
+                        }
+                    }
+                    else{
+                        System.out.println("Election cycle data added successfully.");
+                    }
                 }
+                System.out.println("Did not create tables.");
+            }
+            else{
+                System.out.println("Database already exists.");
             }
 
         }
@@ -271,6 +305,182 @@ public class DataParserModeler {
             return true;
         }
         catch (SQLException sqle){
+            System.out.println(sqle);
+            return false;
+        }
+    }
+
+    //adds candidate data to the Sample database.
+    private boolean addSampleDataToCandidateTable(String[] candidateList){
+        try {
+            PreparedStatement addCandidateData = null;
+            String sqlStatementPreString = "INSERT INTO candidate_table (" +
+                    "candidate_id, party_id, website, result_percentage, result_votes, result, person_id, election_cycle_id, district_id) " +
+                    "VALUES (?,?,?,?,?,?,?,?,?)";
+            addCandidateData = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementPreString);
+            for (String candidate : candidateList) {
+                String[] candidateArray = candidate.split(",");
+                addCandidateData.setInt(1, Integer.parseInt(candidateArray[0]));
+                addCandidateData.setInt(2, Integer.parseInt(candidateArray[1]));
+                addCandidateData.setString(3, candidateArray[2]);
+                addCandidateData.setDouble(4, Double.parseDouble(candidateArray[3]));
+                addCandidateData.setInt(5, Integer.parseInt(candidateArray[4]));
+                addCandidateData.setString(6, candidateArray[5]);
+                addCandidateData.setInt(7, Integer.parseInt(candidateArray[6]));
+                addCandidateData.setInt(8, Integer.parseInt(candidateArray[7]));
+                addCandidateData.setInt(9, Integer.parseInt(candidateArray[8]));
+                addCandidateData.execute();
+            }
+            this.swingLeftDatabaseConnection.commit();
+            addCandidateData.close();
+            System.out.println("Sample candidates added successfully.");
+            return true;
+        }
+        catch (SQLException sqle){
+            System.out.println("Attempt to sample candidates failed.");
+            System.out.println(sqle);
+            return false;
+        }
+    }
+
+    //adds district data to the sample database.
+    private boolean addSampleDataToDistrictTable(String[] districtList){
+        try {
+            PreparedStatement addDistrictDataPS = null;
+            String sqlStatementPreString = "INSERT INTO district_table (" +
+                    "district_id, state, district_name, district_type, latitude, longitude, next_election_year_fk, last_election_year_fk) " +
+                    "VALUES (?,?,?,?,?,?,?,?)";
+            addDistrictDataPS = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementPreString);
+            for (String district : districtList) {
+                String[] districtArray = district.split(",");
+                addDistrictDataPS.setInt(1, Integer.parseInt(districtArray[0]));
+                addDistrictDataPS.setString(2, districtArray[1]);
+                addDistrictDataPS.setString(3, districtArray[2]);
+                addDistrictDataPS.setString(4, districtArray[3]);
+                addDistrictDataPS.setDouble(5, Double.parseDouble(districtArray[4]));
+                addDistrictDataPS.setDouble(6, Double.parseDouble(districtArray[5]));
+                addDistrictDataPS.setInt(7, Integer.parseInt(districtArray[6]));
+                addDistrictDataPS.setInt(8, Integer.parseInt(districtArray[7]));
+                addDistrictDataPS.execute();
+            }
+            this.swingLeftDatabaseConnection.commit();
+            addDistrictDataPS.close();
+            System.out.println("Sample districts added successfully.");
+            return true;
+        }
+        catch (SQLException sqle){
+            System.out.println("Attempt to insert sample districts failed.");
+            System.out.println(sqle);
+            return false;
+        }
+    }
+
+    //adds election cycle data to the sample database.
+    private boolean addSampleDataToElectionCycleTable(String[] electionCycleList){
+        try {
+            PreparedStatement addElectionCycleDataPS = null;
+            String sqlStatementPreString = "INSERT INTO election_cycle_table (" +
+                    "election_cycle_id, cycle_year) " +
+                    "VALUES (?,?)";
+            addElectionCycleDataPS = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementPreString);
+            for (String electionCycle : electionCycleList) {
+                String[] electionCycleArray = electionCycle.split(",");
+                addElectionCycleDataPS.setInt(1, Integer.parseInt(electionCycleArray[0]));
+                addElectionCycleDataPS.setInt(2, Integer.parseInt(electionCycleArray[1]));
+                addElectionCycleDataPS.execute();
+            }
+            this.swingLeftDatabaseConnection.commit();
+            addElectionCycleDataPS.close();
+            System.out.println("Sample election cycles added successfully.");
+            return true;
+        }
+        catch (SQLException sqle){
+            System.out.println("Attempt to insert sample election cycles failed.");
+            System.out.println(sqle);
+            return false;
+        }
+    }
+
+
+    //adds party data to the sample database.
+    private boolean addSampleDataToPartyTable(String[] partyList){
+        try {
+            PreparedStatement addPartyDataPS = null;
+            String sqlStatementPreString = "INSERT INTO national_political_party_table (" +
+                    "party_id, party_name) " +
+                    "VALUES (?,?)";
+            addPartyDataPS = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementPreString);
+            for (String party : partyList) {
+                String[] partyArray = party.split(",");
+                addPartyDataPS.setInt(1, Integer.parseInt(partyArray[0]));
+                addPartyDataPS.setString(2, partyArray[1]);
+                addPartyDataPS.execute();
+            }
+            this.swingLeftDatabaseConnection.commit();
+            addPartyDataPS.close();
+            System.out.println("Sample parties added successfully.");
+            return true;
+        }
+        catch (SQLException sqle){
+            System.out.println("Attempt to insert sample parties failed.");
+            System.out.println(sqle);
+            return false;
+        }
+    }
+
+    //adds district data to the sample database.
+    private boolean addSampleDataToPersonTable(String[] personList){
+        try {
+            PreparedStatement addPersonPS = null;
+            String sqlStatementPreString = "INSERT INTO person_table (" +
+                    "person_id, first_name, middle_name, last_name, post_nominal, state) " +
+                    "VALUES (?,?,?,?,?,?)";
+            addPersonPS = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementPreString);
+            for (String district : personList) {
+                String[] districtArray = district.split(",");
+                addPersonPS.setInt(1, Integer.parseInt(districtArray[0]));
+                addPersonPS.setString(2, districtArray[1]);
+                addPersonPS.setString(3, districtArray[2]);
+                addPersonPS.setString(4, districtArray[3]);
+                addPersonPS.setString(5, districtArray[4]);
+                addPersonPS.setString(6, districtArray[5]);
+                addPersonPS.execute();
+            }
+            this.swingLeftDatabaseConnection.commit();
+            addPersonPS.close();
+            System.out.println("Sample districts added successfully.");
+            return true;
+        }
+        catch (SQLException sqle){
+            System.out.println("Attempt to insert sample districts failed.");
+            System.out.println(sqle);
+            return false;
+        }
+    }
+
+    //adds zip code data to the Sample database.
+    private boolean addSampleDataToZipCodeTable(String[] zipCodeList){
+        try {
+            PreparedStatement addZipCodeDataPS = null;
+            String sqlStatementPreString = "INSERT INTO zip_code_table (" +
+                    "zip_code, longitude, latitude, state) " +
+                    "VALUES (?,?,?,?)";
+            addZipCodeDataPS = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementPreString);
+            for (String candidate : zipCodeList) {
+                String[] candidateArray = candidate.split(",");
+                addZipCodeDataPS.setInt(1, Integer.parseInt(candidateArray[0]));
+                addZipCodeDataPS.setDouble(2, Double.parseDouble(candidateArray[1]));
+                addZipCodeDataPS.setDouble(3, Double.parseDouble(candidateArray[2]));
+                addZipCodeDataPS.setString(4, candidateArray[3]);
+                addZipCodeDataPS.execute();
+            }
+            this.swingLeftDatabaseConnection.commit();
+            addZipCodeDataPS.close();
+            System.out.println("Sample candidates added successfully.");
+            return true;
+        }
+        catch (SQLException sqle){
+            System.out.println("Attempt to sample candidates failed.");
             System.out.println(sqle);
             return false;
         }
