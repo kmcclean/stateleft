@@ -26,58 +26,6 @@ public class DataParserModeler {
         }
     }
 
-    DataParserModeler(String jdbcDriver, String dbConnectStr, String dbUserid, String dbPassword, HashMap<String, String[]> dataHashMap) {
-        try {
-            Class.forName(jdbcDriver).newInstance();
-            DataSource dataSource = getDataBaseDataSource(dbConnectStr);
-            this.swingLeftDatabaseConnection = DriverManager.getConnection(dbConnectStr);
-            if(!createSampleUser(dbUserid, dbPassword, dataSource)){
-                System.exit(1);
-            }
-            this.swingLeftDatabaseConnection = DriverManager.getConnection(dbConnectStr, dbUserid, dbPassword);
-            this.swingLeftDatabaseConnection.setAutoCommit(false);
-            if(createSampleDatabase()) {
-                System.out.println("Sample database created successfully.");
-                this.swingLeftDatabaseConnection = DriverManager.getConnection(dbConnectStr+"/sample_database", dbUserid, dbPassword);
-                this.swingLeftDatabaseConnection.setAutoCommit(false);
-                if (createSampleTables(dataHashMap.get("sample_create_tables.txt"))) {
-                    System.out.println("Tables Added Successfully.");
-                    if (addSampleDataToElectionCycleTable(dataHashMap.get("sample_election_cycle_table_data.txt"))) {
-                        System.out.println("Election Cycle Data Added Successfully.");
-                        if (addSampleDataToPersonTable(dataHashMap.get("sample_person_table_data.txt"))) {
-                            System.out.println("Person Data Added Successfully.");
-                            if (addSampleDataToPartyTable(dataHashMap.get("sample_national_political_parties_table_data.txt"))) {
-                                System.out.println("Party Data Added Successfully.");
-                                if (addSampleDataToDistrictTable(dataHashMap.get("sample_district_table_data.txt"))) {
-                                    System.out.println("District Data Added Successfully.");
-                                    if (addSampleDataToCandidateTable(dataHashMap.get("sample_candidate_table_data.txt"))) {
-                                        System.out.println("Sample Candidate Table Added Successfully.");
-                                    } else {
-                                        System.out.println("Sample Candidate data addition failed.");
-                                    }
-                                } else {
-                                    System.out.println("Sample district data addition failed.");
-                                }
-                            } else {
-                                System.out.println("Party data addition failed.");
-                            }
-                        } else {
-                            System.out.println("Person data additiona failed.");
-                        }
-                    } else {
-                        System.out.println("Election cycle data added successfully.");
-                    }
-                } else {
-                    System.out.println("Did not create tables.");
-                }
-            }
-            else {
-                System.out.println("Did not create sample database.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     //Adds people to the person_table
     public boolean addPeople(List<HashMap<String, String>> peopleList) {
         try {
@@ -340,11 +288,9 @@ public class DataParserModeler {
             }
             this.swingLeftDatabaseConnection.commit();
             addCandidateData.close();
-            System.out.println("Sample candidates added successfully.");
             return true;
         }
         catch (SQLException sqle){
-            System.out.println("Attempt to sample candidates failed.");
             System.out.println(sqle);
             return false;
         }
@@ -372,11 +318,9 @@ public class DataParserModeler {
             }
             this.swingLeftDatabaseConnection.commit();
             addDistrictDataPS.close();
-            System.out.println("Sample districts added successfully.");
             return true;
         }
         catch (SQLException sqle){
-            System.out.println("Attempt to insert sample districts failed.");
             System.out.println(sqle);
             return false;
         }
@@ -398,11 +342,9 @@ public class DataParserModeler {
             }
             this.swingLeftDatabaseConnection.commit();
             addElectionCycleDataPS.close();
-            System.out.println("Sample election cycles added successfully.");
             return true;
         }
         catch (SQLException sqle){
-            System.out.println("Attempt to insert sample election cycles failed.");
             System.out.println(sqle);
             return false;
         }
@@ -425,11 +367,9 @@ public class DataParserModeler {
             }
             this.swingLeftDatabaseConnection.commit();
             addPartyDataPS.close();
-            System.out.println("Sample parties added successfully.");
             return true;
         }
         catch (SQLException sqle){
-            System.out.println("Attempt to insert sample parties failed.");
             System.out.println(sqle);
             return false;
         }
@@ -455,11 +395,9 @@ public class DataParserModeler {
             }
             this.swingLeftDatabaseConnection.commit();
             addPersonPS.close();
-            System.out.println("Sample districts added successfully.");
             return true;
         }
         catch (SQLException sqle){
-            System.out.println("Attempt to insert sample districts failed.");
             System.out.println(sqle);
             return false;
         }
@@ -470,54 +408,37 @@ public class DataParserModeler {
         try {
             PreparedStatement addZipCodeDataPS = null;
             String sqlStatementPreString = "INSERT INTO zip_code_table (" +
-                    "zip_code, longitude, latitude, state) " +
-                    "VALUES (?,?,?,?)";
+                    "zip_code, longitude, latitude) " +
+                    "VALUES (?,?,?)";
             addZipCodeDataPS = this.swingLeftDatabaseConnection.prepareStatement(sqlStatementPreString);
             for (String candidate : zipCodeList) {
                 String[] candidateArray = candidate.split(",");
                 addZipCodeDataPS.setInt(1, Integer.parseInt(candidateArray[0]));
                 addZipCodeDataPS.setDouble(2, Double.parseDouble(candidateArray[1]));
                 addZipCodeDataPS.setDouble(3, Double.parseDouble(candidateArray[2]));
-                addZipCodeDataPS.setString(4, candidateArray[3]);
                 addZipCodeDataPS.execute();
             }
             this.swingLeftDatabaseConnection.commit();
             addZipCodeDataPS.close();
-            System.out.println("Sample candidates added successfully.");
             return true;
         }
         catch (SQLException sqle){
-            System.out.println("Attempt to sample candidates failed.");
             System.out.println(sqle);
             return false;
         }
     }
 
-    private boolean createSampleUser(String newUser, String password, DataSource dataSource){
+    //This creates the sample database.
+    public boolean createSampleDatabase(){
         try {
-            Statement addUser = this.swingLeftDatabaseConnection.createStatement();
-            addUser.execute("CREATE USER '" + newUser + "'@localhost' IDENTIFIED BY '" + password + "';");
-            addUser.execute("GRANT ALL PRIVILEGES ON * . * TO '\" + newUser + \"'@'localhost';");
-            addUser.execute("FLUSH PRIVILEGES;");
-//            JdbcTemplate jdbcTemplate = new JdbcTemplate();
-//            jdbcTemplate.setDataSource(dataSource);
-//            jdbcTemplate.execute("CREATE USER '" + newUser + "'@localhost' IDENTIFIED BY '" + password + "';");
-//            jdbcTemplate.execute("GRANT ALL PRIVILEGES ON * . * TO '" + newUser + "'@'localhost';");
-//            jdbcTemplate.execute("FLUSH PRIVILEGES;");
-            return true;
-        }
-        catch (Exception e){
-            System.out.println(e);
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private boolean createSampleDatabase(){
-        try {
-            Statement createDatabaseStatement = this.swingLeftDatabaseConnection.createStatement();
-            createDatabaseStatement.executeUpdate("CREATE DATABASE IF NOT EXISTS sample_database");
-            return true;
+            if(!checkIfDatabaseExists()) {
+                Statement createDatabaseStatement = this.swingLeftDatabaseConnection.createStatement();
+                createDatabaseStatement.executeUpdate("CREATE DATABASE IF NOT EXISTS sample_database");
+                return true;
+            }
+            else{
+                return false;
+            }
         }
         catch (SQLException sqle){
             System.out.println(sqle);
@@ -526,53 +447,47 @@ public class DataParserModeler {
         }
     }
 
-    private DataSource getDataBaseDataSource(String dbConnectStr){
-        return new DataSource() {
-            @Override
-            public Connection getConnection() throws SQLException {
-                return DriverManager.getConnection(dbConnectStr);
-            }
-
-            @Override
-            public Connection getConnection(String username, String password) throws SQLException {
-                return null;
-            }
-
-            @Override
-            public <T> T unwrap(Class<T> iface) throws SQLException {
-                return null;
-            }
-
-            @Override
-            public boolean isWrapperFor(Class<?> iface) throws SQLException {
-                return false;
-            }
-
-            @Override
-            public PrintWriter getLogWriter() throws SQLException {
-                return null;
-            }
-
-            @Override
-            public void setLogWriter(PrintWriter out) throws SQLException {
-
-            }
-
-            @Override
-            public void setLoginTimeout(int seconds) throws SQLException {
-
-            }
-
-            @Override
-            public int getLoginTimeout() throws SQLException {
-                return 0;
-            }
-
-            @Override
-            public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-                return null;
-            }
-        };
+    //This checks to see if the datbase exists. If it doesn't, it creates a new one.
+    private boolean checkIfDatabaseExists(){
+       try {
+           ResultSet databasesResultSet = this.swingLeftDatabaseConnection.getMetaData().getCatalogs();
+           while (databasesResultSet.next()) {
+               if(databasesResultSet.getString(1).contains("sample_database")){
+                   return true;
+               }
+           }
+           return false;
+       }
+       catch (SQLException sqle){
+           System.out.println(sqle);
+           return true;
+       }
     }
 
+    //this adds all of the data into the database, one table at a time. It is nested if statements to avoid foreign key constraints.
+    public boolean loadSampleData(String dbConnectStr, String dbUserid, String dbPassword, HashMap<String, String[]> dataHashMap) {
+        try {
+            this.swingLeftDatabaseConnection = DriverManager.getConnection(dbConnectStr, dbUserid, dbPassword);
+            this.swingLeftDatabaseConnection.setAutoCommit(false);
+            if (createSampleTables(dataHashMap.get("sample_create_tables.txt"))) {
+                if (addSampleDataToZipCodeTable(dataHashMap.get("sample_zip_code_table_data.txt"))) {
+                    if (addSampleDataToElectionCycleTable(dataHashMap.get("sample_election_cycle_table_data.txt"))) {
+                        if (addSampleDataToPersonTable(dataHashMap.get("sample_person_table_data.txt"))) {
+                            if (addSampleDataToPartyTable(dataHashMap.get("sample_national_political_parties_table_data.txt"))) {
+                                if (addSampleDataToDistrictTable(dataHashMap.get("sample_district_table_data.txt"))) {
+                                    if (addSampleDataToCandidateTable(dataHashMap.get("sample_candidate_table_data.txt"))) {
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        catch (SQLException sqle){
+            System.out.println(sqle);
+            return false;
+        }
+    }
 }

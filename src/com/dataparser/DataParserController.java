@@ -23,10 +23,6 @@ public class DataParserController {
         this.dataModel = startupDatabase(jdbcDriver, dbConnectStr,keyPath);
     }
 
-    //This constructor is used when the sample database is being created.
-    DataParserController(String jdbcDriver, String dbConnectStr, String keyPath, HashMap<String, String[]> dataHashMap) {
-        this.dataModel = createSampleDatabase(jdbcDriver, dbConnectStr, keyPath, dataHashMap);
-    }
     //This runs the two methods dedicated to adding a new text file to the system.
     public boolean addTextFile(List<HashMap<String, String>> newDataHashMapList){
         if(addDataToPersonTable(newDataHashMapList)){
@@ -192,10 +188,15 @@ public class DataParserController {
         return new DataParserModeler(jdbcDriver, dbConnectStr, keysHashMap.get("login"), keysHashMap.get("password"));
     }
 
-    //This starts the database.
-    public DataParserModeler createSampleDatabase(String jdbcDriver, String dbConnectStr, String keyPath, HashMap<String, String[]> dataHashMap) {
-        HashMap<String, String> keysHashMap = getKeys(keyPath);
-        return new DataParserModeler(jdbcDriver, dbConnectStr, keysHashMap.get("login"), keysHashMap.get("password"), dataHashMap);
+    //creates the sample database.
+    public boolean createSampleDatabase(){
+        return this.dataModel.createSampleDatabase();
+    }
+
+    //loads the sample data.
+    public boolean loadSampleData(String dbConnectStr, String keyPath, HashMap<String, String[]> dataHashMap){
+        HashMap<String, String> keyHashMap = getKeys(keyPath);
+        return this.dataModel.loadSampleData(dbConnectStr, keyHashMap.get("login"), keyHashMap.get("password"), dataHashMap);
     }
 
     //Gets the keys used by the database.

@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class Main {
     //this is designed to allow the user to pick the specific methods they need when running the program.
     public static void main(String[] args) {
-        createSampleDatabaseAndRunProgram();
+        //createSampleDatabaseAndRunProgram();
         //testSetup("data/staging_folder/staging_file.txt");
         //prepareFile("data/staging_folder/staging_file.txt");
         //addDataToDatabase("data/prepared_data/prepared_file.txt");
@@ -75,44 +75,53 @@ public class Main {
     //this will create a sample database and put all the necessary information into it so that it can be used as an example.
     public static void createSampleDatabaseAndRunProgram() {
 
-        String createTablesPath;
-        List<String> dataPathsList = new ArrayList<>();
-        HashMap<String, String[]> dataHashMap = new HashMap<String, String[]>();
+        DataParserController dataParserController = new DataParserController("com.mysql.jdbc.Driver", "jdbc:mysql://localhost", "keys/databaselogin.txt");
+        if(dataParserController.createSampleDatabase()) {
 
-        if (System.getProperty("os.name").contains("Window")) {
-            createTablesPath = "sample_files\\sample_create_tables.txt";
+            String createTablesPath;
+            List<String> dataPathsList = new ArrayList<>();
+            HashMap<String, String[]> dataHashMap = new HashMap<String, String[]>();
 
-            dataPathsList.add("sample_files\\sample_candidate_table_data.txt");
-            dataPathsList.add("sample_files\\sample_district_table_data.txt");
-            dataPathsList.add("sample_files\\sample_election_cycle_table_data.txt");
-            dataPathsList.add("sample_files\\sample_person_table_data.txt");
-            dataPathsList.add("sample_files\\sample_national_political_parties_table_data.txt");
-            dataPathsList.add("sample_files\\sample_zip_code_table_data.txt");
+            if (System.getProperty("os.name").contains("Window")) {
+                createTablesPath = "sample_files\\sample_create_tables.txt";
 
-            TextFileModel textFileModel = new TextFileModel();
-            dataHashMap.put(createTablesPath.split("\\\\")[createTablesPath.split("\\\\").length - 1], textFileModel.getSampleTables(createTablesPath));
+                dataPathsList.add("sample_files\\sample_candidate_table_data.txt");
+                dataPathsList.add("sample_files\\sample_district_table_data.txt");
+                dataPathsList.add("sample_files\\sample_election_cycle_table_data.txt");
+                dataPathsList.add("sample_files\\sample_person_table_data.txt");
+                dataPathsList.add("sample_files\\sample_national_political_parties_table_data.txt");
+                dataPathsList.add("sample_files\\sample_zip_code_table_data.txt");
 
-            for (String dataPathString : dataPathsList) {
-                dataHashMap.put(dataPathString.split("\\\\")[dataPathString.split("\\\\").length - 1], textFileModel.getSampleData(dataPathString));
+                TextFileModel textFileModel = new TextFileModel();
+                dataHashMap.put(createTablesPath.split("\\\\")[createTablesPath.split("\\\\").length - 1], textFileModel.getSampleTables(createTablesPath));
+
+                for (String dataPathString : dataPathsList) {
+                    dataHashMap.put(dataPathString.split("\\\\")[dataPathString.split("\\\\").length - 1], textFileModel.getSampleData(dataPathString));
+                }
+            } else {
+                createTablesPath = "sample_files/sample_create_tables.txt";
+
+                dataPathsList.add("sample_files/sample_candidate_table_data.txt");
+                dataPathsList.add("sample_files/sample_district_table_data.txt");
+                dataPathsList.add("sample_files/sample_election_cycle_table_data.txt");
+                dataPathsList.add("sample_files/sample_person_table_data.txt");
+                dataPathsList.add("sample_files/sample_national_political_parties_table_data.txt");
+                dataPathsList.add("sample_files/sample_zip_code_table_data.txt");
+
+                TextFileModel textFileModel = new TextFileModel();
+                dataHashMap.put(createTablesPath.split("/")[createTablesPath.split("/").length - 1], textFileModel.getSampleTables(createTablesPath));
+
+                for (String dataPathString : dataPathsList) {
+                    dataHashMap.put(dataPathString.split("/")[dataPathString.split("/").length - 1], textFileModel.getSampleData(dataPathString));
+                }
             }
-        } else {
-            createTablesPath = "sample_files/sample_create_tables.txt";
-
-            dataPathsList.add("sample_files/sample_candidate_table_data.txt");
-            dataPathsList.add("sample_files/sample_district_table_data.txt");
-            dataPathsList.add("sample_files/sample_election_cycle_table_data.txt");
-            dataPathsList.add("sample_files/sample_person_table_data.txt");
-            dataPathsList.add("sample_files/sample_national_political_parties_table_data.txt");
-            dataPathsList.add("sample_files/sample_zip_code_table_data.txt");
-
-            TextFileModel textFileModel = new TextFileModel();
-            dataHashMap.put(createTablesPath.split("/")[createTablesPath.split("/").length - 1], textFileModel.getSampleTables(createTablesPath));
-
-            for (String dataPathString : dataPathsList) {
-                dataHashMap.put(dataPathString.split("/")[dataPathString.split("/").length - 1], textFileModel.getSampleData(dataPathString));
-            }
+            dataParserController.loadSampleData("jdbc:mysql://localhost/sample_database", "keys/databaselogin.txt", dataHashMap);
         }
-        DataParserController dataParserController = new DataParserController("com.mysql.jdbc.Driver", "jdbc:mysql://localhost", "sample_files/sample_keys.txt", dataHashMap);
+
+        else {
+            dataParserController = new DataParserController("com.mysql.jdbc.Driver", "jdbc:mysql://localhost/sample_database", "keys/databaselogin.txt");
+        }
+
         System.out.printf("Enter zip code: ");
 
         Scanner scanIn = new Scanner(System.in);
