@@ -9,16 +9,16 @@ import java.util.Scanner;
 public class Main {
     //this is designed to allow the user to pick the specific methods they need when running the program.
     public static void main(String[] args) {
-        createSampleDatabase();
+        //createSampleDatabase();
         //testSetup("data/staging_folder/staging_file.txt");
         //prepareFile("data/staging_folder/staging_file.txt");
         //addDataToDatabase("data/prepared_data/prepared_file.txt");
-        //runProgram();
+        runProgram();
     }
 
     //This runs the program using a console, allowing the user to find the closest competitive state legislature race.
     public static void runProgram() {
-        DataParserController dataParserController = new DataParserController("jdbc:mysql://localhost:3306/swing_left_database", "keys/databaselogin.txt");
+        DataParserController dataParserController = new DataParserController("com.mysql.jdbc.Driver","jdbc:mysql://localhost:3306/swing_left_database", "keys/databaselogin.txt");
         System.out.printf("Enter zip code: ");
 
         Scanner scanIn = new Scanner(System.in);
@@ -44,7 +44,7 @@ public class Main {
     //adds new data to the database.
     public static void addDataToDatabase(String filePathString){
         TextFileModel textFileModel = new TextFileModel();
-        DataParserController dataParserController = new DataParserController("jdbc:mysql://localhost:3306/swing_left_database", "keys/databaselogin.txt");
+        DataParserController dataParserController = new DataParserController("com.mysql.jdbc.Driver","jdbc:mysql://localhost:3306/swing_left_database", "keys/databaselogin.txt");
         if(dataParserController.addTextFile(textFileModel.fetchTextFileForDatabase(filePathString))){
             System.out.println("Data added successfully.");
         }
@@ -78,6 +78,7 @@ public class Main {
         String createTablesPath;
         List<String> dataPathsList = new ArrayList<>();
         String tableColumns;
+        HashMap<String, String[]> dataHashMap = new HashMap<String, String[]>();
 
         if (System.getProperty("os.name").contains("Window")) {
             createTablesPath = "sample_files\\sample_create_tables.txt";
@@ -89,7 +90,6 @@ public class Main {
             dataPathsList.add("sample_files\\sample_national_political_parties_table_data.txt");
             dataPathsList.add("sample_files\\sample_zip_code_table_data.txt");
 
-            tableColumns = "sample_files\\tables_columns.txt";
         }
         else {
             createTablesPath = "sample_files/sample_create_tables.txt";
@@ -101,17 +101,14 @@ public class Main {
             dataPathsList.add("sample_files/sample_national_political_parties_table_data.txt");
             dataPathsList.add("sample_files/sample_zip_code_table_data.txt");
 
-            tableColumns = "sample_files/tables_columns.txt";
+            TextFileModel textFileModel = new TextFileModel();
+            dataHashMap.put(createTablesPath.split("/")[createTablesPath.split("/").length-1],textFileModel.getSampleTables(createTablesPath));
+
+            for (String dataPathString : dataPathsList) {
+                dataHashMap.put(dataPathString.split("/")[dataPathString.split("/").length-1], textFileModel.getSampleData(dataPathString));
+            }
+            DataParserController dataParserController = new DataParserController("com.mysql.jdbc.Driver","jdbc:mysql://localhost/", "sample_files/sample_keys.txt", dataHashMap);
         }
 
-        TextFileModel textFileModel = new TextFileModel();
-        String[] createTables = textFileModel.getSampleTables(createTablesPath);
-        String[] columnsArray = textFileModel.getSampleColumnNames(tableColumns);
-        String currentTable = "";
-        String sqlStatements = "";
-        for(String s: createTables){
-
-
-        }
     }
 }

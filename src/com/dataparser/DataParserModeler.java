@@ -9,9 +9,9 @@ public class DataParserModeler {
     Connection swingLeftDatabaseConnection = null;
 
     //starts up the database when the class is created.
-    DataParserModeler(String dbConnectStr, String dbUserid, String dbPassword) {
+    DataParserModeler(String jdbcDriver, String dbConnectStr, String dbUserid, String dbPassword) {
         try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            Class.forName(jdbcDriver).newInstance();
             this.swingLeftDatabaseConnection = DriverManager.getConnection(dbConnectStr, dbUserid, dbPassword);
             this.swingLeftDatabaseConnection.setAutoCommit(false);
         }
@@ -20,24 +20,24 @@ public class DataParserModeler {
         }
     }
 
-    DataParserModeler(String jdbcDriver, String dbConnectStr, String dbUserid, String dbPassword, String[] sampleData){
+    DataParserModeler(String jdbcDriver, String dbConnectStr, String dbUserid, String dbPassword, HashMap<String, String[]> dataHashMap){
         try {
             Class.forName(jdbcDriver).newInstance();
-            this.swingLeftDatabaseConnection = DriverManager.getConnection("jdbc:mysql://localhost/?user=" + dbUserid + "&password=" + dbPassword);
+            this.swingLeftDatabaseConnection = DriverManager.getConnection(dbConnectStr,dbUserid,dbPassword);
             Statement createDatabaseStatement = this.swingLeftDatabaseConnection.createStatement();
             if(createDatabaseStatement.executeUpdate("CREATE DATABASE IF NOT EXISTS sample_database")==0){
                 System.out.println("Sample database created successfully.");
-                if(createSampleTables(sampleData)){
+                if(createSampleTables(dataHashMap.get("sample_create_tables.txt"))){
                     System.out.println("Tables Added Successfully.");
-                    if(addSampleDataToElectionCycleTable(sampleData)){
+                    if(addSampleDataToElectionCycleTable(dataHashMap.get("sample_election_cycle_table_data.txt"))){
                         System.out.println("Election Cycle Data Added Successfully.");
-                        if(addSampleDataToPersonTable(sampleData)){
+                        if(addSampleDataToPersonTable(dataHashMap.get("sample_person_table_data.txt"))){
                             System.out.println("Person Data Added Successfully.");
-                            if(addSampleDataToPartyTable(sampleData)){
+                            if(addSampleDataToPartyTable(dataHashMap.get("sample_national_political_parties_table_data.txt"))){
                                 System.out.println("Party Data Added Successfully.");
-                                if (addSampleDataToDistrictTable(sampleData)){
+                                if (addSampleDataToDistrictTable(dataHashMap.get("sample_district_table_data.txt"))){
                                     System.out.println("District Data Added Successfully.");
-                                    if(addSampleDataToCandidateTable(sampleData)){
+                                    if(addSampleDataToCandidateTable(dataHashMap.get("sample_candidate_table_data.txt"))){
                                         System.out.println("Sample Candidate Table Added Successfully.");
                                     }
                                     else{
@@ -295,6 +295,7 @@ public class DataParserModeler {
         return tableDataResultSet;
     }
 
+    //this creates the sample tables that will be used.
     private boolean createSampleTables(String[] tableList){
         PreparedStatement createTablePS;
         try{

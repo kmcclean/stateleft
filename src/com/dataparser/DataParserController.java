@@ -17,13 +17,16 @@ import java.util.stream.Stream;
 public class DataParserController {
     DataParserModeler dataModel;
 
-    DataParserController(String dbConnectStr, String keyPath) {
-        this.dataModel = startupDatabase(dbConnectStr, keyPath);
+    //This is the standard constructor for the class.
+    DataParserController(String jdbcDriver, String dbConnectStr, String keyPath) {
+        HashMap<String, String> keys = getKeys(keyPath);
+        this.dataModel = startupDatabase(jdbcDriver, dbConnectStr,keyPath);
     }
 
-    DataParserController(String jdbcDriver, String dbConnectStr, String keyPath, String[] tableList) {
-        HashMap<String, String> sampleKeys = getKeys(keyPath);
-        this.dataModel = new DataParserModeler(jdbcDriver, dbConnectStr, sampleKeys.get("login"), sampleKeys.get("password"), tableList);
+    //This constructor is used when the sample database is being created.
+    DataParserController(String jdbcDriver, String dbConnectStr, String keyPath, HashMap<String, String[]> dataHashMap) {
+        this.dataModel = createSampleDatabase(jdbcDriver, dbConnectStr, keyPath, dataHashMap);
+        this.dataModel.closeConnection();
 
     }
     //This runs the two methods dedicated to adding a new text file to the system.
@@ -186,9 +189,15 @@ public class DataParserController {
 
 
     //This starts the database.
-    public DataParserModeler startupDatabase(String dbConnectStr, String keyPath) {
+    public DataParserModeler startupDatabase(String jdbcDriver, String dbConnectStr, String keyPath) {
         HashMap<String, String> keysHashMap = getKeys(keyPath);
-        return new DataParserModeler(dbConnectStr, keysHashMap.get("login"), keysHashMap.get("password"));
+        return new DataParserModeler(jdbcDriver, dbConnectStr, keysHashMap.get("login"), keysHashMap.get("password"));
+    }
+
+    //This starts the database.
+    public DataParserModeler createSampleDatabase(String jdbcDriver, String dbConnectStr, String keyPath, HashMap<String, String[]> dataHashMap) {
+        HashMap<String, String> keysHashMap = getKeys(keyPath);
+        return new DataParserModeler(jdbcDriver, dbConnectStr, keysHashMap.get("login"), keysHashMap.get("password"), dataHashMap);
     }
 
     //Gets the keys used by the database.
@@ -207,6 +216,8 @@ public class DataParserController {
         }
         return keyHashMap;
     }
+
+
 
    //closes the database.
     public boolean closeDatabase(){
