@@ -44,7 +44,8 @@ public class Main {
     //adds new data to the database.
     public static void addDataToDatabase(String filePathString){
         TextFileModel textFileModel = new TextFileModel();
-        DataParserController dataParserController = new DataParserController("com.mysql.jdbc.Driver","jdbc:mysql://localhost:3306/swing_left_database", "keys/databaselogin.txt");
+        String keyPath = "keys/databaselogin.txt";
+        DataParserController dataParserController = new DataParserController("com.mysql.jdbc.Driver","jdbc:mysql://localhost:3306/swing_left_database", keyPath);
         if(dataParserController.addTextFile(textFileModel.fetchTextFileForDatabase(filePathString))){
             System.out.println("Data added successfully.");
         }
@@ -75,7 +76,11 @@ public class Main {
     //this will create a sample database and put all the necessary information into it so that it can be used as an example.
     public static void createSampleDatabaseAndRunProgram() {
 
-        DataParserController dataParserController = new DataParserController("com.mysql.jdbc.Driver", "jdbc:mysql://localhost", "keys/databaselogin.txt");
+        String keyPath = "sample_files/sample_keys.txt";
+        if(System.getProperty("os_name").contains("Window")){
+            keyPath = "sample_files\\sample_keys.txt";
+        }
+        DataParserController dataParserController = new DataParserController("com.mysql.jdbc.Driver", "jdbc:mysql://localhost", keyPath);
         if(dataParserController.createSampleDatabase()) {
 
             String createTablesPath;
@@ -115,11 +120,11 @@ public class Main {
                     dataHashMap.put(dataPathString.split("/")[dataPathString.split("/").length - 1], textFileModel.getSampleData(dataPathString));
                 }
             }
-            dataParserController.loadSampleData("jdbc:mysql://localhost/sample_database", "keys/databaselogin.txt", dataHashMap);
+            dataParserController.loadSampleData("jdbc:mysql://localhost/sample_database", keyPath, dataHashMap);
         }
 
         else {
-            dataParserController = new DataParserController("com.mysql.jdbc.Driver", "jdbc:mysql://localhost/sample_database", "keys/databaselogin.txt");
+            dataParserController = new DataParserController("com.mysql.jdbc.Driver", "jdbc:mysql://localhost/sample_database", keyPath);
         }
 
         System.out.printf("Enter zip code: ");
