@@ -249,15 +249,12 @@ public class TextFileModel {
         }
         return fullString.split(";");
     }
-
     public String[] getSampleData(String filePath){
         Object[] fileObjectArray = fetchTextFile(filePath);
         String fullString = "";
         for (Object fileObject: fileObjectArray){
             fullString += fileObject.toString()+"\n";
         }
-        System.out.println(fullString);
         return fullString.split("\n");
     }
-
 }

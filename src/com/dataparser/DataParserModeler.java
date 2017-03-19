@@ -1,5 +1,7 @@
 package com.dataparser;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import java.sql.*;
 import java.util.*;
 
@@ -20,58 +22,53 @@ public class DataParserModeler {
         }
     }
 
-    DataParserModeler(String jdbcDriver, String dbConnectStr, String dbUserid, String dbPassword, HashMap<String, String[]> dataHashMap){
+    DataParserModeler(String jdbcDriver, String dbConnectStr, String dbUserid, String dbPassword, HashMap<String, String[]> dataHashMap) {
         try {
             Class.forName(jdbcDriver).newInstance();
-            this.swingLeftDatabaseConnection = DriverManager.getConnection(dbConnectStr,dbUserid,dbPassword);
-            Statement createDatabaseStatement = this.swingLeftDatabaseConnection.createStatement();
-            if(createDatabaseStatement.executeUpdate("CREATE DATABASE IF NOT EXISTS sample_database")==0){
+            this.swingLeftDatabaseConnection = DriverManager.getConnection(dbConnectStr, dbUserid, dbPassword);
+            this.swingLeftDatabaseConnection.setAutoCommit(false);
+            if(createSampleDatabase()) {
                 System.out.println("Sample database created successfully.");
-                if(createSampleTables(dataHashMap.get("sample_create_tables.txt"))){
+                this.swingLeftDatabaseConnection = DriverManager.getConnection(dbConnectStr+"/sample_database", dbUserid, dbPassword);
+                this.swingLeftDatabaseConnection.setAutoCommit(false);
+                if (createSampleTables(dataHashMap.get("sample_create_tables.txt"))) {
                     System.out.println("Tables Added Successfully.");
-                    if(addSampleDataToElectionCycleTable(dataHashMap.get("sample_election_cycle_table_data.txt"))){
+                    if (addSampleDataToElectionCycleTable(dataHashMap.get("sample_election_cycle_table_data.txt"))) {
                         System.out.println("Election Cycle Data Added Successfully.");
-                        if(addSampleDataToPersonTable(dataHashMap.get("sample_person_table_data.txt"))){
+                        if (addSampleDataToPersonTable(dataHashMap.get("sample_person_table_data.txt"))) {
                             System.out.println("Person Data Added Successfully.");
-                            if(addSampleDataToPartyTable(dataHashMap.get("sample_national_political_parties_table_data.txt"))){
+                            if (addSampleDataToPartyTable(dataHashMap.get("sample_national_political_parties_table_data.txt"))) {
                                 System.out.println("Party Data Added Successfully.");
-                                if (addSampleDataToDistrictTable(dataHashMap.get("sample_district_table_data.txt"))){
+                                if (addSampleDataToDistrictTable(dataHashMap.get("sample_district_table_data.txt"))) {
                                     System.out.println("District Data Added Successfully.");
-                                    if(addSampleDataToCandidateTable(dataHashMap.get("sample_candidate_table_data.txt"))){
+                                    if (addSampleDataToCandidateTable(dataHashMap.get("sample_candidate_table_data.txt"))) {
                                         System.out.println("Sample Candidate Table Added Successfully.");
-                                    }
-                                    else{
+                                    } else {
                                         System.out.println("Sample Candidate data addition failed.");
                                     }
-                                }
-                                else{
+                                } else {
                                     System.out.println("Sample district data addition failed.");
                                 }
-                            }
-                            else{
+                            } else {
                                 System.out.println("Party data addition failed.");
                             }
-                        }
-                        else{
+                        } else {
                             System.out.println("Person data additiona failed.");
                         }
-                    }
-                    else{
+                    } else {
                         System.out.println("Election cycle data added successfully.");
                     }
+                } else {
+                    System.out.println("Did not create tables.");
                 }
-                System.out.println("Did not create tables.");
             }
-            else{
-                System.out.println("Database already exists.");
+            else {
+                System.out.println("Did not create sample database.");
             }
-
-        }
-        catch (Exception e){
-            System.out.println(e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-
     //Adds people to the person_table
     public boolean addPeople(List<HashMap<String, String>> peopleList) {
         try {
@@ -102,7 +99,6 @@ public class DataParserModeler {
     public boolean closeConnection(){
         try{
             this.swingLeftDatabaseConnection.close();
-
         }
         catch(SQLException sqle){
             System.out.println(sqle);
@@ -307,6 +303,7 @@ public class DataParserModeler {
         }
         catch (SQLException sqle){
             System.out.println(sqle);
+            sqle.printStackTrace();
             return false;
         }
     }
@@ -483,6 +480,27 @@ public class DataParserModeler {
         catch (SQLException sqle){
             System.out.println("Attempt to sample candidates failed.");
             System.out.println(sqle);
+            return false;
+        }
+    }
+
+    private boolean createSampleUser(String newUser, String password){
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+        jdbcTemplate.execute("CREATE USER '" +newUser + "'@'localhost' IDENTIFIED BY '" + password + "';");
+        jdbcTemplate.execute("GRANT ALL PRIVILEGES ON * . * TO '" + newUser + "'@'localhost';");
+        jdbcTemplate.execute("FLUSH PRIVILEGES;");
+        return true;
+    }
+
+    private boolean createSampleDatabase(){
+        try {
+            Statement createDatabaseStatement = this.swingLeftDatabaseConnection.createStatement();
+            createDatabaseStatement.executeUpdate("CREATE DATABASE IF NOT EXISTS sample_database");
+            return true;
+        }
+        catch (SQLException sqle){
+            System.out.println(sqle);
+            sqle.printStackTrace();
             return false;
         }
     }

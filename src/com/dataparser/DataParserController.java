@@ -26,8 +26,6 @@ public class DataParserController {
     //This constructor is used when the sample database is being created.
     DataParserController(String jdbcDriver, String dbConnectStr, String keyPath, HashMap<String, String[]> dataHashMap) {
         this.dataModel = createSampleDatabase(jdbcDriver, dbConnectStr, keyPath, dataHashMap);
-        this.dataModel.closeConnection();
-
     }
     //This runs the two methods dedicated to adding a new text file to the system.
     public boolean addTextFile(List<HashMap<String, String>> newDataHashMapList){
