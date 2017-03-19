@@ -2,11 +2,15 @@ package com.dataparser;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
+import java.io.PrintWriter;
 import java.sql.*;
 import java.util.*;
+import java.util.logging.Logger;
 
 //This class takes data from the database and gives it to the controller.
 public class DataParserModeler {
+
 
     Connection swingLeftDatabaseConnection = null;
 
@@ -25,6 +29,11 @@ public class DataParserModeler {
     DataParserModeler(String jdbcDriver, String dbConnectStr, String dbUserid, String dbPassword, HashMap<String, String[]> dataHashMap) {
         try {
             Class.forName(jdbcDriver).newInstance();
+            DataSource dataSource = getDataBaseDataSource(dbConnectStr);
+            this.swingLeftDatabaseConnection = DriverManager.getConnection(dbConnectStr);
+            if(!createSampleUser(dbUserid, dbPassword, dataSource)){
+                System.exit(1);
+            }
             this.swingLeftDatabaseConnection = DriverManager.getConnection(dbConnectStr, dbUserid, dbPassword);
             this.swingLeftDatabaseConnection.setAutoCommit(false);
             if(createSampleDatabase()) {
@@ -484,12 +493,24 @@ public class DataParserModeler {
         }
     }
 
-    private boolean createSampleUser(String newUser, String password){
-        JdbcTemplate jdbcTemplate = new JdbcTemplate();
-        jdbcTemplate.execute("CREATE USER '" +newUser + "'@'localhost' IDENTIFIED BY '" + password + "';");
-        jdbcTemplate.execute("GRANT ALL PRIVILEGES ON * . * TO '" + newUser + "'@'localhost';");
-        jdbcTemplate.execute("FLUSH PRIVILEGES;");
-        return true;
+    private boolean createSampleUser(String newUser, String password, DataSource dataSource){
+        try {
+            Statement addUser = this.swingLeftDatabaseConnection.createStatement();
+            addUser.execute("CREATE USER '" + newUser + "'@localhost' IDENTIFIED BY '" + password + "';");
+            addUser.execute("GRANT ALL PRIVILEGES ON * . * TO '\" + newUser + \"'@'localhost';");
+            addUser.execute("FLUSH PRIVILEGES;");
+//            JdbcTemplate jdbcTemplate = new JdbcTemplate();
+//            jdbcTemplate.setDataSource(dataSource);
+//            jdbcTemplate.execute("CREATE USER '" + newUser + "'@localhost' IDENTIFIED BY '" + password + "';");
+//            jdbcTemplate.execute("GRANT ALL PRIVILEGES ON * . * TO '" + newUser + "'@'localhost';");
+//            jdbcTemplate.execute("FLUSH PRIVILEGES;");
+            return true;
+        }
+        catch (Exception e){
+            System.out.println(e);
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private boolean createSampleDatabase(){
@@ -503,6 +524,55 @@ public class DataParserModeler {
             sqle.printStackTrace();
             return false;
         }
+    }
+
+    private DataSource getDataBaseDataSource(String dbConnectStr){
+        return new DataSource() {
+            @Override
+            public Connection getConnection() throws SQLException {
+                return DriverManager.getConnection(dbConnectStr);
+            }
+
+            @Override
+            public Connection getConnection(String username, String password) throws SQLException {
+                return null;
+            }
+
+            @Override
+            public <T> T unwrap(Class<T> iface) throws SQLException {
+                return null;
+            }
+
+            @Override
+            public boolean isWrapperFor(Class<?> iface) throws SQLException {
+                return false;
+            }
+
+            @Override
+            public PrintWriter getLogWriter() throws SQLException {
+                return null;
+            }
+
+            @Override
+            public void setLogWriter(PrintWriter out) throws SQLException {
+
+            }
+
+            @Override
+            public void setLoginTimeout(int seconds) throws SQLException {
+
+            }
+
+            @Override
+            public int getLoginTimeout() throws SQLException {
+                return 0;
+            }
+
+            @Override
+            public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+                return null;
+            }
+        };
     }
 
 }
